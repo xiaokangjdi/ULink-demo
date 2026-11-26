@@ -1,0 +1,32 @@
+{
+  "schema": "mtlink-browser-data/v1",
+  "max_len": 1024,
+  "shards": 128,
+  "platforms": [
+    {
+      "platform": "isp",
+      "users": 30429,
+      "tokens": 3435411
+    },
+    {
+      "platform": "wb",
+      "users": 20730,
+      "tokens": 176294
+    },
+    {
+      "platform": "tw",
+      "users": 11239,
+      "tokens": 1187063
+    },
+    {
+      "platform": "fs",
+      "users": 8569,
+      "tokens": 232932
+    },
+    {
+      "platform": "fb",
+      "users": 7146,
+      "tokens": 309664
+    }
+  ]
+}

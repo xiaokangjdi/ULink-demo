@@ -1,0 +1,1716 @@
+[
+  {
+    "combo_id": "isp_wb_improved",
+    "source": {
+      "summary": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/isp_wb_last_experiment_results.json"
+      },
+      "last_run_test_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/test_metrics.json"
+      },
+      "train_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/train_metrics.json"
+      },
+      "run_directory": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb",
+        "kind": "directory",
+        "files": [
+          ".DS_Store",
+          "accuracy.png",
+          "auc.png",
+          "f1_score.png",
+          "isp_wb_last_experiment_results.json",
+          "loss.png",
+          "precision.png",
+          "recall.png",
+          "test_metrics.json",
+          "train_metrics.json"
+        ]
+      }
+    },
+    "runs": [
+      {
+        "seed": "454",
+        "precision": 0.7247109992752263,
+        "recall": 0.8423755787037037,
+        "f1": 0.7577459397325971,
+        "auc": 0.9145184426641267,
+        "accuracy": 0.847594246031746
+      },
+      {
+        "seed": "512",
+        "precision": 0.7013758747187188,
+        "recall": 0.8297053671321895,
+        "f1": 0.7295484054125336,
+        "auc": 0.8986450084667059,
+        "accuracy": 0.8203695255474452
+      },
+      {
+        "seed": "631",
+        "precision": 0.7110248291203092,
+        "recall": 0.8333940665904439,
+        "f1": 0.7417290355980819,
+        "auc": 0.9097899331053794,
+        "accuracy": 0.833125
+      },
+      {
+        "seed": "812",
+        "precision": 0.6976166832174777,
+        "recall": 0.8304612106780298,
+        "f1": 0.7242077745643918,
+        "auc": 0.9044435143156583,
+        "accuracy": 0.8136792452830188
+      },
+      {
+        "seed": "932",
+        "precision": 0.708929899752148,
+        "recall": 0.8471234340785128,
+        "f1": 0.7381838683308584,
+        "auc": 0.9203283440735006,
+        "accuracy": 0.8240256653992395
+      }
+    ],
+    "metrics": {
+      "precision": {
+        "mean": 0.708731657216776,
+        "std": 0.009362558339115925,
+        "values": [
+          0.7247109992752263,
+          0.7013758747187188,
+          0.7110248291203092,
+          0.6976166832174777,
+          0.708929899752148
+        ],
+        "count": 5
+      },
+      "recall": {
+        "mean": 0.836611931436576,
+        "std": 0.006922397967749652,
+        "values": [
+          0.8423755787037037,
+          0.8297053671321895,
+          0.8333940665904439,
+          0.8304612106780298,
+          0.8471234340785128
+        ],
+        "count": 5
+      },
+      "f1": {
+        "mean": 0.7382830047276926,
+        "std": 0.011533396075191885,
+        "values": [
+          0.7577459397325971,
+          0.7295484054125336,
+          0.7417290355980819,
+          0.7242077745643918,
+          0.7381838683308584
+        ],
+        "count": 5
+      },
+      "auc": {
+        "mean": 0.9095450485250742,
+        "std": 0.007561886076484099,
+        "values": [
+          0.9145184426641267,
+          0.8986450084667059,
+          0.9097899331053794,
+          0.9044435143156583,
+          0.9203283440735006
+        ],
+        "count": 5
+      },
+      "accuracy": {
+        "mean": 0.8277587364522899,
+        "std": 0.011738931413115581,
+        "values": [
+          0.847594246031746,
+          0.8203695255474452,
+          0.833125,
+          0.8136792452830188,
+          0.8240256653992395
+        ],
+        "count": 5
+      }
+    },
+    "last_run": {
+      "test_loss": 0.6452969854888807,
+      "accuracy": 0.8240256653992395,
+      "precision": 0.708929899752148,
+      "recall": 0.8471234340785128,
+      "f1": 0.7381838683308584,
+      "auc": 0.9203283440735006
+    },
+    "experiment_config": {
+      "isReproduce": false,
+      "gpu": 1,
+      "times": 5,
+      "save": "./result_isp_wb/",
+      "dense_dataset": "isp",
+      "sparse_dataset": "wb",
+      "dense_filter": 400,
+      "sparse_filter": 200,
+      "period": "all",
+      "time_segment": "day",
+      "positive_nums": 1,
+      "sparse_negative_nums": 3,
+      "dense_negative_nums": 3,
+      "loss_mod": "BCEWithLogitsLoss",
+      "epochs": 50,
+      "batch_size": 32,
+      "lr": 0.001,
+      "embed_size": 64,
+      "num_heads": 8,
+      "num_layers_mask": 2,
+      "num_layers_attn": 1,
+      "num_layers": 4,
+      "p": 0.15,
+      "p_drop": 0.2,
+      "threshold": 0.2,
+      "mask_strategy": "topK",
+      "average": "macro",
+      "patience": 5,
+      "classifier_type": "MeanPool"
+    },
+    "curves": {
+      "available": true,
+      "kind": "train_metrics_json",
+      "train_loss": [
+        0.9163731048054268,
+        0.7284286571460037,
+        0.6420049454905488,
+        0.5862358923545224,
+        0.5398368984388984,
+        0.4989524178364985,
+        0.47149047213126055,
+        0.4497812381490217,
+        0.43339056594040437,
+        0.41260634636795623
+      ],
+      "valid_loss": [
+        0.7798595340746753,
+        0.7196072533445538,
+        0.7188363428385752,
+        0.6286523939584786,
+        0.6092314690913794,
+        0.6205462284807889,
+        0.6331937499203772,
+        0.7395875879897261,
+        0.6480412113778996,
+        0.6433241399110489
+      ],
+      "train_accuracy": [
+        0.7208293153326905,
+        0.7996172854387656,
+        0.8260758196721312,
+        0.8443979026036644,
+        0.8561656219864995,
+        0.8685812439729991,
+        0.8748041224686596,
+        0.8813283510125361,
+        0.8854869816779171,
+        0.889344262295082
+      ],
+      "val_accuracy": [
+        0.8027122641509434,
+        0.8081367924528302,
+        0.7919811320754717,
+        0.8533018867924528,
+        0.8334905660377359,
+        0.8625,
+        0.8757075471698114,
+        0.8926886792452831,
+        0.8640330188679245,
+        0.8702830188679245
+      ]
+    },
+    "curve_images": {
+      "loss": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/loss.png",
+        "kind": "file"
+      },
+      "accuracy": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/accuracy.png",
+        "kind": "file"
+      },
+      "precision": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/precision.png",
+        "kind": "file"
+      },
+      "recall": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/recall.png",
+        "kind": "file"
+      },
+      "f1": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/f1_score.png",
+        "kind": "file"
+      },
+      "auc": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/auc.png",
+        "kind": "file"
+      }
+    },
+    "warnings": [],
+    "kind": "seed_sweep",
+    "provenance": "Reproduced in this project. Values are read verbatim from the files listed in 'source' and are never recomputed by the API.",
+    "label": "ISP - Weibo",
+    "checkpoint": {
+      "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_isp_wb/temp/isp_wb_454_checkpoint.pt",
+      "exists": true,
+      "seed": "454",
+      "loaded": true
+    },
+    "consistency": {
+      "checkpoint_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "reported_experiment_config": {
+        "isReproduce": false,
+        "gpu": 1,
+        "times": 5,
+        "save": "./result_isp_wb/",
+        "dense_dataset": "isp",
+        "sparse_dataset": "wb",
+        "dense_filter": 400,
+        "sparse_filter": 200,
+        "period": "all",
+        "time_segment": "day",
+        "positive_nums": 1,
+        "sparse_negative_nums": 3,
+        "dense_negative_nums": 3,
+        "loss_mod": "BCEWithLogitsLoss",
+        "epochs": 50,
+        "batch_size": 32,
+        "lr": 0.001,
+        "embed_size": 64,
+        "num_heads": 8,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "num_layers": 4,
+        "p": 0.15,
+        "p_drop": 0.2,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "average": "macro",
+        "patience": 5,
+        "classifier_type": "MeanPool"
+      },
+      "differences": [],
+      "matches_reported_experiment": true,
+      "note": "The loaded checkpoint matches the training configuration recorded for the reported run."
+    },
+    "paper_reference": {
+      "available": true,
+      "source": {
+        "title": "Correlation-Attention Masked Temporal Transformer for User Identity Linkage Using Heterogeneous Mobility Data",
+        "model_name": "MT-Link",
+        "authors": "Ziang Yan, Xingyu Zhao, Hanqing Ma, Wei Chen, Jianpeng Qi, Yanwei Yu, Junyu Dong",
+        "affiliations": "Ocean University of China; HKUST (Guangzhou)",
+        "venue": "AAAI-25 (Thirty-Ninth AAAI Conference on Artificial Intelligence), 2025",
+        "pages": "12999-13007",
+        "official_code": "https://github.com/DrivenA/MT-Link",
+        "local_pdf": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/15745-YanZ.pdf"
+      },
+      "protocol": {
+        "metrics": "Macro-Precision, Macro-Recall, Macro-F1 and AUC, all reported in percent.",
+        "decision_rule": "Figure 2 of the paper: p >= 0.5 -> same user, p < 0.5 -> different users. The paper never states the threshold in the text and performs no calibration study.",
+        "reported_runs": "Each experiment repeated 5 times; only the average is printed (no standard deviation).",
+        "hardware": "NVIDIA RTX 3090",
+        "hyperparameters_reported": {
+          "embedding_dim": 64,
+          "mask_ratio": 0.1,
+          "learning_rate": 0.001,
+          "dropout": 0.1,
+          "correlation_attention_layers": 2,
+          "early_stopping_patience": 5
+        },
+        "not_reported_by_the_paper": [
+          "how positive and negative user pairs are constructed (sampling scheme, negative ratio)",
+          "the train/validation/test split",
+          "batch size, optimizer, number of epochs, learning-rate schedule",
+          "number of attention heads, number of temporal-transformer layers, d_p / d_t / d_k",
+          "random seeds",
+          "the class weights w_i used by the weighted binary cross-entropy",
+          "how the two k x d output matrices are pooled before being concatenated",
+          "the number of ground-truth matched pairs, the time span and the geographic area",
+          "a POI vocabulary or grid definition for the location embedding"
+        ]
+      },
+      "columns": [
+        "precision",
+        "recall",
+        "f1",
+        "auc"
+      ],
+      "published": {
+        "DPLink": {
+          "precision": 24.99,
+          "recall": 50.0,
+          "f1": 33.32,
+          "auc": 50.57
+        },
+        "DPLink-SM": {
+          "precision": 50.7,
+          "recall": 53.09,
+          "f1": 40.64,
+          "auc": 52.88
+        },
+        "CPLink": {
+          "precision": 63.07,
+          "recall": 70.72,
+          "f1": 66.67,
+          "auc": 80.17
+        },
+        "CPLink+": {
+          "precision": 63.01,
+          "recall": 69.34,
+          "f1": 66.02,
+          "auc": 79.57
+        },
+        "MT-Link (paper)": {
+          "precision": 80.37,
+          "recall": 79.46,
+          "f1": 79.85,
+          "auc": 86.89
+        }
+      },
+      "mt_link": {
+        "precision": 80.37,
+        "recall": 79.46,
+        "f1": 79.85,
+        "auc": 86.89
+      },
+      "caveats": [
+        "The paper reports Macro-Precision / Macro-Recall / Macro-F1 / AUC in percent, and this project's result files use the same macro averaging ('average': 'macro'), so the aggregation is comparable.",
+        "This project's models were trained from the released CSV trajectories with the paper's length filters. The paper does NOT describe its train/validation/test split or its positive/negative pair construction, so the two evaluations are run on different (though similar) sample populations.",
+        "The paper prints only five-run averages with no standard deviation; this project reports mean and population standard deviation over the same five seeds (454, 512, 631, 812, 932).",
+        "The paper reports no Accuracy; this project's ISP-Weibo summary includes Accuracy, which has no counterpart in Table 2.",
+        "The paper also removes sequences shorter than 3 from ISP and Weibo; the released training code contains no such minimum-length filter (the reproduced Weibo index still contains users with a single check-in), so a small number of extremely short trajectories that the paper would have dropped are present here.",
+        "The paper's Table 2 'Impro.' row and two claims in the abstract/ablation text are internally inconsistent with its own tables, so the paper numbers are quoted as published and never recomputed.",
+        "Differences in F1/AUC below roughly two percentage points cannot be interpreted as a methodological difference given the undocumented split and pair sampling."
+      ],
+      "ablation": {
+        "w/o MTE (no masked transformer encoder)": [
+          62.05,
+          64.33,
+          71.63,
+          83.33
+        ],
+        "w/o CAB (no correlation attention block)": [
+          56.17,
+          67.04,
+          67.1,
+          82.2
+        ],
+        "w/o TTE (no temporal transformer encoder)": [
+          54.2,
+          58.38,
+          68.52,
+          84.98
+        ],
+        "MT-Link (paper)": [
+          68.06,
+          82.43,
+          73.82,
+          87.86
+        ]
+      }
+    }
+  },
+  {
+    "combo_id": "tw_fs_improved",
+    "source": {
+      "summary": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/tw_fs_last_experiment_results.json"
+      },
+      "last_run_test_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/test_metrics.json"
+      },
+      "train_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/train_metrics.json"
+      },
+      "run_directory": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs",
+        "kind": "directory",
+        "files": [
+          ".DS_Store",
+          "accuracy.png",
+          "auc.png",
+          "f1_score.png",
+          "loss.png",
+          "precision.png",
+          "recall.png",
+          "test_metrics.json",
+          "train_metrics.json",
+          "tw_fs_last_experiment_results.json"
+        ]
+      }
+    },
+    "runs": [
+      {
+        "seed": "454",
+        "precision": 0.6269037423198659,
+        "recall": 0.7465277777777778,
+        "f1": 0.6154430178929595,
+        "auc": 0.8189923321759259,
+        "accuracy": 0.6994047619047619
+      },
+      {
+        "seed": "512",
+        "precision": 0.6267057868780823,
+        "recall": 0.7238952500717012,
+        "f1": 0.6334554334554334,
+        "auc": 0.797049771659276,
+        "accuracy": 0.7401315789473685
+      },
+      {
+        "seed": "631",
+        "precision": 0.6107986331609665,
+        "recall": 0.6987847222222222,
+        "f1": 0.6123096857790735,
+        "auc": 0.7799388744212963,
+        "accuracy": 0.7217261904761905
+      },
+      {
+        "seed": "812",
+        "precision": 0.6070698223159701,
+        "recall": 0.7161293232540098,
+        "f1": 0.5712645404930802,
+        "auc": 0.790419831490068,
+        "accuracy": 0.6429521276595744
+      },
+      {
+        "seed": "932",
+        "precision": 0.6283630093584879,
+        "recall": 0.7406205042780344,
+        "f1": 0.6261372192426647,
+        "auc": 0.8006170969940183,
+        "accuracy": 0.71875
+      }
+    ],
+    "metrics": {
+      "precision": {
+        "mean": 0.6199681988066745,
+        "std": 0.009104051309950869,
+        "values": [
+          0.6269037423198659,
+          0.6267057868780823,
+          0.6107986331609665,
+          0.6070698223159701,
+          0.6283630093584879
+        ],
+        "count": 5
+      },
+      "recall": {
+        "mean": 0.7251915155207491,
+        "std": 0.01717214107953934,
+        "values": [
+          0.7465277777777778,
+          0.7238952500717012,
+          0.6987847222222222,
+          0.7161293232540098,
+          0.7406205042780344
+        ],
+        "count": 5
+      },
+      "f1": {
+        "mean": 0.6117219793726423,
+        "std": 0.021592304434971385,
+        "values": [
+          0.6154430178929595,
+          0.6334554334554334,
+          0.6123096857790735,
+          0.5712645404930802,
+          0.6261372192426647
+        ],
+        "count": 5
+      },
+      "auc": {
+        "mean": 0.797403581348117,
+        "std": 0.012886541634799693,
+        "values": [
+          0.8189923321759259,
+          0.797049771659276,
+          0.7799388744212963,
+          0.790419831490068,
+          0.8006170969940183
+        ],
+        "count": 5
+      },
+      "accuracy": {
+        "mean": 0.7045929317975791,
+        "std": 0.03341697896546015,
+        "values": [
+          0.6994047619047619,
+          0.7401315789473685,
+          0.7217261904761905,
+          0.6429521276595744,
+          0.71875
+        ],
+        "count": 5
+      }
+    },
+    "last_run": {
+      "test_loss": 0.9922840464405898,
+      "accuracy": 0.71875,
+      "precision": 0.6283630093584879,
+      "recall": 0.7406205042780344,
+      "f1": 0.6261372192426647,
+      "auc": 0.8006170969940183
+    },
+    "experiment_config": {
+      "isReproduce": false,
+      "gpu": 3,
+      "times": 5,
+      "save": "./result_tw_fs/",
+      "dense_dataset": "tw",
+      "sparse_dataset": "fs",
+      "dense_filter": 400,
+      "sparse_filter": 200,
+      "period": "all",
+      "time_segment": "day",
+      "positive_nums": 1,
+      "sparse_negative_nums": 3,
+      "dense_negative_nums": 3,
+      "loss_mod": "BCEWithLogitsLoss",
+      "epochs": 50,
+      "batch_size": 32,
+      "lr": 0.001,
+      "embed_size": 64,
+      "num_heads": 8,
+      "num_layers_mask": 2,
+      "num_layers_attn": 1,
+      "num_layers": 4,
+      "p": 0.15,
+      "p_drop": 0.2,
+      "threshold": 0.2,
+      "mask_strategy": "topK",
+      "average": "macro",
+      "patience": 5,
+      "classifier_type": "MeanPool"
+    },
+    "curves": {
+      "available": true,
+      "kind": "train_metrics_json",
+      "train_loss": [
+        1.0833885371685028,
+        0.9319045400502635,
+        0.8205120829390544,
+        0.7110171524527805,
+        0.6255290361206516,
+        0.5303229582709035,
+        0.46100811102713635,
+        0.4159890060964363,
+        0.3369766134476545
+      ],
+      "valid_loss": [
+        0.9466979077884129,
+        1.045831744159971,
+        1.0318472257682256,
+        0.890753264938082,
+        1.00497343426659,
+        0.9189293547755196,
+        1.1216064095497131,
+        1.150472980879602,
+        1.3534397113890875
+      ],
+      "train_accuracy": [
+        0.6099877450980392,
+        0.6966911764705882,
+        0.7453022875816994,
+        0.7860498366013072,
+        0.816687091503268,
+        0.8486519607843137,
+        0.8706086601307189,
+        0.8831699346405228,
+        0.9099264705882353
+      ],
+      "val_accuracy": [
+        0.7150297619047619,
+        0.5252976190476191,
+        0.6867559523809523,
+        0.7113095238095238,
+        0.7440476190476191,
+        0.7529761904761905,
+        0.7462797619047619,
+        0.7581845238095238,
+        0.7886904761904762
+      ]
+    },
+    "curve_images": {
+      "loss": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/loss.png",
+        "kind": "file"
+      },
+      "accuracy": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/accuracy.png",
+        "kind": "file"
+      },
+      "precision": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/precision.png",
+        "kind": "file"
+      },
+      "recall": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/recall.png",
+        "kind": "file"
+      },
+      "f1": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/f1_score.png",
+        "kind": "file"
+      },
+      "auc": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/auc.png",
+        "kind": "file"
+      }
+    },
+    "warnings": [],
+    "kind": "seed_sweep",
+    "provenance": "Reproduced in this project. Values are read verbatim from the files listed in 'source' and are never recomputed by the API.",
+    "label": "Twitter - Foursquare",
+    "checkpoint": {
+      "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fs/temp/tw_fs_454_checkpoint.pt",
+      "exists": true,
+      "seed": "454",
+      "loaded": true
+    },
+    "consistency": {
+      "checkpoint_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "reported_experiment_config": {
+        "isReproduce": false,
+        "gpu": 3,
+        "times": 5,
+        "save": "./result_tw_fs/",
+        "dense_dataset": "tw",
+        "sparse_dataset": "fs",
+        "dense_filter": 400,
+        "sparse_filter": 200,
+        "period": "all",
+        "time_segment": "day",
+        "positive_nums": 1,
+        "sparse_negative_nums": 3,
+        "dense_negative_nums": 3,
+        "loss_mod": "BCEWithLogitsLoss",
+        "epochs": 50,
+        "batch_size": 32,
+        "lr": 0.001,
+        "embed_size": 64,
+        "num_heads": 8,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "num_layers": 4,
+        "p": 0.15,
+        "p_drop": 0.2,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "average": "macro",
+        "patience": 5,
+        "classifier_type": "MeanPool"
+      },
+      "differences": [],
+      "matches_reported_experiment": true,
+      "note": "The loaded checkpoint matches the training configuration recorded for the reported run."
+    },
+    "paper_reference": {
+      "available": true,
+      "source": {
+        "title": "Correlation-Attention Masked Temporal Transformer for User Identity Linkage Using Heterogeneous Mobility Data",
+        "model_name": "MT-Link",
+        "authors": "Ziang Yan, Xingyu Zhao, Hanqing Ma, Wei Chen, Jianpeng Qi, Yanwei Yu, Junyu Dong",
+        "affiliations": "Ocean University of China; HKUST (Guangzhou)",
+        "venue": "AAAI-25 (Thirty-Ninth AAAI Conference on Artificial Intelligence), 2025",
+        "pages": "12999-13007",
+        "official_code": "https://github.com/DrivenA/MT-Link",
+        "local_pdf": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/15745-YanZ.pdf"
+      },
+      "protocol": {
+        "metrics": "Macro-Precision, Macro-Recall, Macro-F1 and AUC, all reported in percent.",
+        "decision_rule": "Figure 2 of the paper: p >= 0.5 -> same user, p < 0.5 -> different users. The paper never states the threshold in the text and performs no calibration study.",
+        "reported_runs": "Each experiment repeated 5 times; only the average is printed (no standard deviation).",
+        "hardware": "NVIDIA RTX 3090",
+        "hyperparameters_reported": {
+          "embedding_dim": 64,
+          "mask_ratio": 0.1,
+          "learning_rate": 0.001,
+          "dropout": 0.1,
+          "correlation_attention_layers": 2,
+          "early_stopping_patience": 5
+        },
+        "not_reported_by_the_paper": [
+          "how positive and negative user pairs are constructed (sampling scheme, negative ratio)",
+          "the train/validation/test split",
+          "batch size, optimizer, number of epochs, learning-rate schedule",
+          "number of attention heads, number of temporal-transformer layers, d_p / d_t / d_k",
+          "random seeds",
+          "the class weights w_i used by the weighted binary cross-entropy",
+          "how the two k x d output matrices are pooled before being concatenated",
+          "the number of ground-truth matched pairs, the time span and the geographic area",
+          "a POI vocabulary or grid definition for the location embedding"
+        ]
+      },
+      "columns": [
+        "precision",
+        "recall",
+        "f1",
+        "auc"
+      ],
+      "published": {
+        "DPLink": {
+          "precision": 51.4,
+          "recall": 52.38,
+          "f1": 51.08,
+          "auc": 51.91
+        },
+        "DPLink-SM": {
+          "precision": 55.42,
+          "recall": 53.02,
+          "f1": 52.17,
+          "auc": 52.27
+        },
+        "CPLink": {
+          "precision": 53.32,
+          "recall": 58.57,
+          "f1": 55.8,
+          "auc": 74.97
+        },
+        "CPLink+": {
+          "precision": 58.76,
+          "recall": 65.67,
+          "f1": 62.01,
+          "auc": 78.96
+        },
+        "MT-Link (paper)": {
+          "precision": 66.14,
+          "recall": 73.21,
+          "f1": 68.06,
+          "auc": 82.43
+        }
+      },
+      "mt_link": {
+        "precision": 66.14,
+        "recall": 73.21,
+        "f1": 68.06,
+        "auc": 82.43
+      },
+      "caveats": [
+        "The paper reports Macro-Precision / Macro-Recall / Macro-F1 / AUC in percent, and this project's result files use the same macro averaging ('average': 'macro'), so the aggregation is comparable.",
+        "This project's models were trained from the released CSV trajectories with the paper's length filters. The paper does NOT describe its train/validation/test split or its positive/negative pair construction, so the two evaluations are run on different (though similar) sample populations.",
+        "The paper prints only five-run averages with no standard deviation; this project reports mean and population standard deviation over the same five seeds (454, 512, 631, 812, 932).",
+        "The paper reports no Accuracy; this project's ISP-Weibo summary includes Accuracy, which has no counterpart in Table 2.",
+        "The paper also removes sequences shorter than 3 from ISP and Weibo; the released training code contains no such minimum-length filter (the reproduced Weibo index still contains users with a single check-in), so a small number of extremely short trajectories that the paper would have dropped are present here.",
+        "The paper's Table 2 'Impro.' row and two claims in the abstract/ablation text are internally inconsistent with its own tables, so the paper numbers are quoted as published and never recomputed.",
+        "Differences in F1/AUC below roughly two percentage points cannot be interpreted as a methodological difference given the undocumented split and pair sampling."
+      ],
+      "ablation": {
+        "w/o MTE (no masked transformer encoder)": [
+          62.05,
+          64.33,
+          71.63,
+          83.33
+        ],
+        "w/o CAB (no correlation attention block)": [
+          56.17,
+          67.04,
+          67.1,
+          82.2
+        ],
+        "w/o TTE (no temporal transformer encoder)": [
+          54.2,
+          58.38,
+          68.52,
+          84.98
+        ],
+        "MT-Link (paper)": [
+          68.06,
+          82.43,
+          73.82,
+          87.86
+        ]
+      }
+    }
+  },
+  {
+    "combo_id": "tw_fb_improved",
+    "source": {
+      "summary": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/tw_fb_last_experiment_results.json"
+      },
+      "last_run_test_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/test_metrics.json"
+      },
+      "train_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/train_metrics.json"
+      },
+      "run_directory": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb",
+        "kind": "directory",
+        "files": [
+          "accuracy.png",
+          "auc.png",
+          "f1_score.png",
+          "loss.png",
+          "precision.png",
+          "recall.png",
+          "test_metrics.json",
+          "train_metrics.json",
+          "tw_fb_last_experiment_results.json"
+        ]
+      }
+    },
+    "runs": [
+      {
+        "seed": "454",
+        "precision": 0.6677449400631503,
+        "recall": 0.7991071428571428,
+        "f1": 0.6827725261767946,
+        "auc": 0.8738141741071429,
+        "accuracy": 0.7735969387755102
+      },
+      {
+        "seed": "512",
+        "precision": 0.6474161240341478,
+        "recall": 0.7735529238436357,
+        "f1": 0.6514460268972904,
+        "auc": 0.84067786417911,
+        "accuracy": 0.7404891304347826
+      },
+      {
+        "seed": "631",
+        "precision": 0.6616865026963937,
+        "recall": 0.7900755658266387,
+        "f1": 0.6742217855737482,
+        "auc": 0.8734822640402039,
+        "accuracy": 0.7653186274509803
+      },
+      {
+        "seed": "812",
+        "precision": 0.6652386351095103,
+        "recall": 0.7591540652389419,
+        "f1": 0.6869565217391305,
+        "auc": 0.8422802158896006,
+        "accuracy": 0.7986111111111112
+      },
+      {
+        "seed": "932",
+        "precision": 0.6685289941103895,
+        "recall": 0.7992979317550578,
+        "f1": 0.6838586140868395,
+        "auc": 0.8604207147716212,
+        "accuracy": 0.7744565217391305
+      }
+    ],
+    "metrics": {
+      "precision": {
+        "mean": 0.6621230392027183,
+        "std": 0.007730884597702179,
+        "values": [
+          0.6677449400631503,
+          0.6474161240341478,
+          0.6616865026963937,
+          0.6652386351095103,
+          0.6685289941103895
+        ],
+        "count": 5
+      },
+      "recall": {
+        "mean": 0.7842375259042834,
+        "std": 0.015654678297518276,
+        "values": [
+          0.7991071428571428,
+          0.7735529238436357,
+          0.7900755658266387,
+          0.7591540652389419,
+          0.7992979317550578
+        ],
+        "count": 5
+      },
+      "f1": {
+        "mean": 0.6758510948947607,
+        "std": 0.012912157626235553,
+        "values": [
+          0.6827725261767946,
+          0.6514460268972904,
+          0.6742217855737482,
+          0.6869565217391305,
+          0.6838586140868395
+        ],
+        "count": 5
+      },
+      "auc": {
+        "mean": 0.8581350465975357,
+        "std": 0.014441089131118637,
+        "values": [
+          0.8738141741071429,
+          0.84067786417911,
+          0.8734822640402039,
+          0.8422802158896006,
+          0.8604207147716212
+        ],
+        "count": 5
+      },
+      "accuracy": {
+        "mean": 0.770494465902303,
+        "std": 0.018670717299417012,
+        "values": [
+          0.7735969387755102,
+          0.7404891304347826,
+          0.7653186274509803,
+          0.7986111111111112,
+          0.7744565217391305
+        ],
+        "count": 5
+      }
+    },
+    "last_run": {
+      "test_loss": 0.8354642708664355,
+      "accuracy": 0.7744565217391305,
+      "precision": 0.6685289941103895,
+      "recall": 0.7992979317550578,
+      "f1": 0.6838586140868395,
+      "auc": 0.8604207147716212
+    },
+    "experiment_config": {
+      "isReproduce": false,
+      "gpu": 3,
+      "times": 5,
+      "save": "./result_tw_fb/",
+      "dense_dataset": "tw",
+      "sparse_dataset": "fb",
+      "dense_filter": 400,
+      "sparse_filter": 200,
+      "period": "all",
+      "time_segment": "day",
+      "positive_nums": 1,
+      "sparse_negative_nums": 3,
+      "dense_negative_nums": 3,
+      "loss_mod": "BCEWithLogitsLoss",
+      "epochs": 50,
+      "batch_size": 32,
+      "lr": 0.001,
+      "embed_size": 64,
+      "num_heads": 8,
+      "num_layers_mask": 2,
+      "num_layers_attn": 1,
+      "num_layers": 4,
+      "p": 0.15,
+      "p_drop": 0.2,
+      "threshold": 0.2,
+      "mask_strategy": "topK",
+      "average": "macro",
+      "patience": 5,
+      "classifier_type": "MeanPool"
+    },
+    "curves": {
+      "available": true,
+      "kind": "train_metrics_json",
+      "train_loss": [
+        0.979908607667312,
+        0.7530772837344557,
+        0.6130135452064375,
+        0.5129236665088683,
+        0.4380887672014069,
+        0.35834745642690297,
+        0.3103128721995745
+      ],
+      "valid_loss": [
+        0.9005136142174403,
+        0.8086194371183714,
+        0.8877077226837476,
+        0.9325428176671267,
+        0.8929134216159582,
+        0.9500048129508892,
+        1.1198227245671053
+      ],
+      "train_accuracy": [
+        0.6722819010416666,
+        0.7870279947916666,
+        0.825927734375,
+        0.8540852864583334,
+        0.8800455729166666,
+        0.90380859375,
+        0.917724609375
+      ],
+      "val_accuracy": [
+        0.7330729166666666,
+        0.7884114583333334,
+        0.6946614583333334,
+        0.7923177083333334,
+        0.8372395833333334,
+        0.84765625,
+        0.8600260416666666
+      ]
+    },
+    "curve_images": {
+      "loss": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/loss.png",
+        "kind": "file"
+      },
+      "accuracy": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/accuracy.png",
+        "kind": "file"
+      },
+      "precision": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/precision.png",
+        "kind": "file"
+      },
+      "recall": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/recall.png",
+        "kind": "file"
+      },
+      "f1": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/f1_score.png",
+        "kind": "file"
+      },
+      "auc": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/auc.png",
+        "kind": "file"
+      }
+    },
+    "warnings": [],
+    "kind": "seed_sweep",
+    "provenance": "Reproduced in this project. Values are read verbatim from the files listed in 'source' and are never recomputed by the API.",
+    "label": "Twitter - Facebook",
+    "checkpoint": {
+      "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_tw_fb/temp/tw_fb_454_checkpoint.pt",
+      "exists": true,
+      "seed": "454",
+      "loaded": true
+    },
+    "consistency": {
+      "checkpoint_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "reported_experiment_config": {
+        "isReproduce": false,
+        "gpu": 3,
+        "times": 5,
+        "save": "./result_tw_fb/",
+        "dense_dataset": "tw",
+        "sparse_dataset": "fb",
+        "dense_filter": 400,
+        "sparse_filter": 200,
+        "period": "all",
+        "time_segment": "day",
+        "positive_nums": 1,
+        "sparse_negative_nums": 3,
+        "dense_negative_nums": 3,
+        "loss_mod": "BCEWithLogitsLoss",
+        "epochs": 50,
+        "batch_size": 32,
+        "lr": 0.001,
+        "embed_size": 64,
+        "num_heads": 8,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "num_layers": 4,
+        "p": 0.15,
+        "p_drop": 0.2,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "average": "macro",
+        "patience": 5,
+        "classifier_type": "MeanPool"
+      },
+      "differences": [],
+      "matches_reported_experiment": true,
+      "note": "The loaded checkpoint matches the training configuration recorded for the reported run."
+    },
+    "paper_reference": {
+      "available": true,
+      "source": {
+        "title": "Correlation-Attention Masked Temporal Transformer for User Identity Linkage Using Heterogeneous Mobility Data",
+        "model_name": "MT-Link",
+        "authors": "Ziang Yan, Xingyu Zhao, Hanqing Ma, Wei Chen, Jianpeng Qi, Yanwei Yu, Junyu Dong",
+        "affiliations": "Ocean University of China; HKUST (Guangzhou)",
+        "venue": "AAAI-25 (Thirty-Ninth AAAI Conference on Artificial Intelligence), 2025",
+        "pages": "12999-13007",
+        "official_code": "https://github.com/DrivenA/MT-Link",
+        "local_pdf": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/15745-YanZ.pdf"
+      },
+      "protocol": {
+        "metrics": "Macro-Precision, Macro-Recall, Macro-F1 and AUC, all reported in percent.",
+        "decision_rule": "Figure 2 of the paper: p >= 0.5 -> same user, p < 0.5 -> different users. The paper never states the threshold in the text and performs no calibration study.",
+        "reported_runs": "Each experiment repeated 5 times; only the average is printed (no standard deviation).",
+        "hardware": "NVIDIA RTX 3090",
+        "hyperparameters_reported": {
+          "embedding_dim": 64,
+          "mask_ratio": 0.1,
+          "learning_rate": 0.001,
+          "dropout": 0.1,
+          "correlation_attention_layers": 2,
+          "early_stopping_patience": 5
+        },
+        "not_reported_by_the_paper": [
+          "how positive and negative user pairs are constructed (sampling scheme, negative ratio)",
+          "the train/validation/test split",
+          "batch size, optimizer, number of epochs, learning-rate schedule",
+          "number of attention heads, number of temporal-transformer layers, d_p / d_t / d_k",
+          "random seeds",
+          "the class weights w_i used by the weighted binary cross-entropy",
+          "how the two k x d output matrices are pooled before being concatenated",
+          "the number of ground-truth matched pairs, the time span and the geographic area",
+          "a POI vocabulary or grid definition for the location embedding"
+        ]
+      },
+      "columns": [
+        "precision",
+        "recall",
+        "f1",
+        "auc"
+      ],
+      "published": {
+        "DPLink": {
+          "precision": 64.52,
+          "recall": 54.97,
+          "f1": 55.39,
+          "auc": 52.29
+        },
+        "DPLink-SM": {
+          "precision": 66.69,
+          "recall": 55.4,
+          "f1": 55.99,
+          "auc": 53.21
+        },
+        "CPLink": {
+          "precision": 60.34,
+          "recall": 61.19,
+          "f1": 60.74,
+          "auc": 77.21
+        },
+        "CPLink+": {
+          "precision": 63.06,
+          "recall": 68.04,
+          "f1": 65.44,
+          "auc": 80.67
+        },
+        "MT-Link (paper)": {
+          "precision": 71.09,
+          "recall": 80.46,
+          "f1": 73.82,
+          "auc": 87.86
+        }
+      },
+      "mt_link": {
+        "precision": 71.09,
+        "recall": 80.46,
+        "f1": 73.82,
+        "auc": 87.86
+      },
+      "caveats": [
+        "The paper reports Macro-Precision / Macro-Recall / Macro-F1 / AUC in percent, and this project's result files use the same macro averaging ('average': 'macro'), so the aggregation is comparable.",
+        "This project's models were trained from the released CSV trajectories with the paper's length filters. The paper does NOT describe its train/validation/test split or its positive/negative pair construction, so the two evaluations are run on different (though similar) sample populations.",
+        "The paper prints only five-run averages with no standard deviation; this project reports mean and population standard deviation over the same five seeds (454, 512, 631, 812, 932).",
+        "The paper reports no Accuracy; this project's ISP-Weibo summary includes Accuracy, which has no counterpart in Table 2.",
+        "The paper also removes sequences shorter than 3 from ISP and Weibo; the released training code contains no such minimum-length filter (the reproduced Weibo index still contains users with a single check-in), so a small number of extremely short trajectories that the paper would have dropped are present here.",
+        "The paper's Table 2 'Impro.' row and two claims in the abstract/ablation text are internally inconsistent with its own tables, so the paper numbers are quoted as published and never recomputed.",
+        "Differences in F1/AUC below roughly two percentage points cannot be interpreted as a methodological difference given the undocumented split and pair sampling."
+      ],
+      "ablation": {
+        "w/o MTE (no masked transformer encoder)": [
+          62.05,
+          64.33,
+          71.63,
+          83.33
+        ],
+        "w/o CAB (no correlation attention block)": [
+          56.17,
+          67.04,
+          67.1,
+          82.2
+        ],
+        "w/o TTE (no temporal transformer encoder)": [
+          54.2,
+          58.38,
+          68.52,
+          84.98
+        ],
+        "MT-Link (paper)": [
+          68.06,
+          82.43,
+          73.82,
+          87.86
+        ]
+      }
+    }
+  },
+  {
+    "combo_id": "fs_fb_improved",
+    "source": {
+      "summary": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/fs_fb_last_experiment_results.json"
+      },
+      "last_run_test_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/test_metrics.json"
+      },
+      "train_metrics": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/train_metrics.json"
+      },
+      "run_directory": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb",
+        "kind": "directory",
+        "files": [
+          "accuracy.png",
+          "auc.png",
+          "f1_score.png",
+          "fs_fb_last_experiment_results.json",
+          "loss.png",
+          "precision.png",
+          "recall.png",
+          "test_metrics.json",
+          "train_metrics.json"
+        ]
+      }
+    },
+    "runs": [
+      {
+        "seed": "454",
+        "precision": 0.6317401960784315,
+        "recall": 0.7541746711984632,
+        "f1": 0.622520107238606,
+        "auc": 0.8044431308802521,
+        "accuracy": 0.7059659090909091
+      },
+      {
+        "seed": "512",
+        "precision": 0.6339193572165709,
+        "recall": 0.7386417746252237,
+        "f1": 0.6410500547901214,
+        "auc": 0.7974812406613796,
+        "accuracy": 0.7428977272727273
+      },
+      {
+        "seed": "631",
+        "precision": 0.6140320861888607,
+        "recall": 0.7109375,
+        "f1": 0.6116130384655697,
+        "auc": 0.7906901041666666,
+        "accuracy": 0.7127976190476191
+      },
+      {
+        "seed": "812",
+        "precision": 0.6167620229934689,
+        "recall": 0.7114665558786872,
+        "f1": 0.6173862815884477,
+        "auc": 0.8128497763874972,
+        "accuracy": 0.7204861111111112
+      },
+      {
+        "seed": "932",
+        "precision": 0.6054017529634349,
+        "recall": 0.704387541179994,
+        "f1": 0.5878296526272626,
+        "auc": 0.7369721473495059,
+        "accuracy": 0.6752717391304348
+      }
+    ],
+    "metrics": {
+      "precision": {
+        "mean": 0.6203710830881534,
+        "std": 0.010863714860797355,
+        "values": [
+          0.6317401960784315,
+          0.6339193572165709,
+          0.6140320861888607,
+          0.6167620229934689,
+          0.6054017529634349
+        ],
+        "count": 5
+      },
+      "recall": {
+        "mean": 0.7239216085764737,
+        "std": 0.0191688616709146,
+        "values": [
+          0.7541746711984632,
+          0.7386417746252237,
+          0.7109375,
+          0.7114665558786872,
+          0.704387541179994
+        ],
+        "count": 5
+      },
+      "f1": {
+        "mean": 0.6160798269420015,
+        "std": 0.017232068134355752,
+        "values": [
+          0.622520107238606,
+          0.6410500547901214,
+          0.6116130384655697,
+          0.6173862815884477,
+          0.5878296526272626
+        ],
+        "count": 5
+      },
+      "auc": {
+        "mean": 0.7884872798890603,
+        "std": 0.026786836551669763,
+        "values": [
+          0.8044431308802521,
+          0.7974812406613796,
+          0.7906901041666666,
+          0.8128497763874972,
+          0.7369721473495059
+        ],
+        "count": 5
+      },
+      "accuracy": {
+        "mean": 0.7114838211305603,
+        "std": 0.02196070593141674,
+        "values": [
+          0.7059659090909091,
+          0.7428977272727273,
+          0.7127976190476191,
+          0.7204861111111112,
+          0.6752717391304348
+        ],
+        "count": 5
+      }
+    },
+    "last_run": {
+      "test_loss": 1.0273603304572727,
+      "accuracy": 0.6752717391304348,
+      "precision": 0.6054017529634349,
+      "recall": 0.704387541179994,
+      "f1": 0.5878296526272626,
+      "auc": 0.7369721473495059
+    },
+    "experiment_config": {
+      "isReproduce": false,
+      "gpu": 1,
+      "times": 5,
+      "save": "./result_fs_fb/",
+      "dense_dataset": "fs",
+      "sparse_dataset": "fb",
+      "dense_filter": 400,
+      "sparse_filter": 200,
+      "period": "all",
+      "time_segment": "day",
+      "positive_nums": 1,
+      "sparse_negative_nums": 3,
+      "dense_negative_nums": 3,
+      "loss_mod": "BCEWithLogitsLoss",
+      "epochs": 50,
+      "batch_size": 32,
+      "lr": 0.001,
+      "embed_size": 64,
+      "num_heads": 8,
+      "num_layers_mask": 2,
+      "num_layers_attn": 1,
+      "num_layers": 4,
+      "p": 0.15,
+      "p_drop": 0.2,
+      "threshold": 0.2,
+      "mask_strategy": "topK",
+      "average": "macro",
+      "patience": 5,
+      "classifier_type": "MeanPool"
+    },
+    "curves": {
+      "available": true,
+      "kind": "train_metrics_json",
+      "train_loss": [
+        1.085114843277044,
+        0.9156362237625344,
+        0.7633887155111446,
+        0.6286220891877662,
+        0.5421633091430331,
+        0.4466905020350634
+      ],
+      "valid_loss": [
+        1.0075119449978782,
+        1.0547934543518793,
+        1.0513728998956227,
+        1.0161829321157365,
+        1.366847771973837,
+        1.3776566769395555
+      ],
+      "train_accuracy": [
+        0.5977470930232558,
+        0.7063953488372093,
+        0.7716206395348837,
+        0.8090479651162791,
+        0.8357558139534884,
+        0.8744549418604651
+      ],
+      "val_accuracy": [
+        0.65625,
+        0.75,
+        0.6770833333333334,
+        0.7351190476190477,
+        0.7886904761904762,
+        0.7425595238095238
+      ]
+    },
+    "curve_images": {
+      "loss": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/loss.png",
+        "kind": "file"
+      },
+      "accuracy": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/accuracy.png",
+        "kind": "file"
+      },
+      "precision": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/precision.png",
+        "kind": "file"
+      },
+      "recall": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/recall.png",
+        "kind": "file"
+      },
+      "f1": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/f1_score.png",
+        "kind": "file"
+      },
+      "auc": {
+        "available": true,
+        "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/auc.png",
+        "kind": "file"
+      }
+    },
+    "warnings": [],
+    "kind": "seed_sweep",
+    "provenance": "Reproduced in this project. Values are read verbatim from the files listed in 'source' and are never recomputed by the API.",
+    "label": "Foursquare - Facebook",
+    "checkpoint": {
+      "path": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/MT-LInk_improved\u5b9e\u9a8c\u7ed3\u679c/result_fs_fb/temp/fs_fb_454_checkpoint.pt",
+      "exists": true,
+      "seed": "454",
+      "loaded": true
+    },
+    "consistency": {
+      "checkpoint_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "reported_experiment_config": {
+        "isReproduce": false,
+        "gpu": 1,
+        "times": 5,
+        "save": "./result_fs_fb/",
+        "dense_dataset": "fs",
+        "sparse_dataset": "fb",
+        "dense_filter": 400,
+        "sparse_filter": 200,
+        "period": "all",
+        "time_segment": "day",
+        "positive_nums": 1,
+        "sparse_negative_nums": 3,
+        "dense_negative_nums": 3,
+        "loss_mod": "BCEWithLogitsLoss",
+        "epochs": 50,
+        "batch_size": 32,
+        "lr": 0.001,
+        "embed_size": 64,
+        "num_heads": 8,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "num_layers": 4,
+        "p": 0.15,
+        "p_drop": 0.2,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "average": "macro",
+        "patience": 5,
+        "classifier_type": "MeanPool"
+      },
+      "differences": [],
+      "matches_reported_experiment": true,
+      "note": "The loaded checkpoint matches the training configuration recorded for the reported run."
+    },
+    "paper_reference": {
+      "available": true,
+      "source": {
+        "title": "Correlation-Attention Masked Temporal Transformer for User Identity Linkage Using Heterogeneous Mobility Data",
+        "model_name": "MT-Link",
+        "authors": "Ziang Yan, Xingyu Zhao, Hanqing Ma, Wei Chen, Jianpeng Qi, Yanwei Yu, Junyu Dong",
+        "affiliations": "Ocean University of China; HKUST (Guangzhou)",
+        "venue": "AAAI-25 (Thirty-Ninth AAAI Conference on Artificial Intelligence), 2025",
+        "pages": "12999-13007",
+        "official_code": "https://github.com/DrivenA/MT-Link",
+        "local_pdf": "/Users/xiaokang/\u65f6\u7a7a\u6570\u636e\u6316\u6398/15745-YanZ.pdf"
+      },
+      "protocol": {
+        "metrics": "Macro-Precision, Macro-Recall, Macro-F1 and AUC, all reported in percent.",
+        "decision_rule": "Figure 2 of the paper: p >= 0.5 -> same user, p < 0.5 -> different users. The paper never states the threshold in the text and performs no calibration study.",
+        "reported_runs": "Each experiment repeated 5 times; only the average is printed (no standard deviation).",
+        "hardware": "NVIDIA RTX 3090",
+        "hyperparameters_reported": {
+          "embedding_dim": 64,
+          "mask_ratio": 0.1,
+          "learning_rate": 0.001,
+          "dropout": 0.1,
+          "correlation_attention_layers": 2,
+          "early_stopping_patience": 5
+        },
+        "not_reported_by_the_paper": [
+          "how positive and negative user pairs are constructed (sampling scheme, negative ratio)",
+          "the train/validation/test split",
+          "batch size, optimizer, number of epochs, learning-rate schedule",
+          "number of attention heads, number of temporal-transformer layers, d_p / d_t / d_k",
+          "random seeds",
+          "the class weights w_i used by the weighted binary cross-entropy",
+          "how the two k x d output matrices are pooled before being concatenated",
+          "the number of ground-truth matched pairs, the time span and the geographic area",
+          "a POI vocabulary or grid definition for the location embedding"
+        ]
+      },
+      "columns": [
+        "precision",
+        "recall",
+        "f1",
+        "auc"
+      ],
+      "published": {
+        "DPLink": {
+          "precision": 53.34,
+          "recall": 51.83,
+          "f1": 51.88,
+          "auc": 53.78
+        },
+        "DPLink-SM": {
+          "precision": 54.25,
+          "recall": 51.49,
+          "f1": 51.02,
+          "auc": 55.32
+        },
+        "CPLink": {
+          "precision": 46.41,
+          "recall": 62.9,
+          "f1": 53.4,
+          "auc": 79.53
+        },
+        "CPLink+": {
+          "precision": 47.95,
+          "recall": 62.28,
+          "f1": 54.1,
+          "auc": 79.33
+        },
+        "MT-Link (paper)": {
+          "precision": 57.34,
+          "recall": 72.94,
+          "f1": 62.87,
+          "auc": 82.8
+        }
+      },
+      "mt_link": {
+        "precision": 57.34,
+        "recall": 72.94,
+        "f1": 62.87,
+        "auc": 82.8
+      },
+      "caveats": [
+        "The paper reports Macro-Precision / Macro-Recall / Macro-F1 / AUC in percent, and this project's result files use the same macro averaging ('average': 'macro'), so the aggregation is comparable.",
+        "This project's models were trained from the released CSV trajectories with the paper's length filters. The paper does NOT describe its train/validation/test split or its positive/negative pair construction, so the two evaluations are run on different (though similar) sample populations.",
+        "The paper prints only five-run averages with no standard deviation; this project reports mean and population standard deviation over the same five seeds (454, 512, 631, 812, 932).",
+        "The paper reports no Accuracy; this project's ISP-Weibo summary includes Accuracy, which has no counterpart in Table 2.",
+        "The paper also removes sequences shorter than 3 from ISP and Weibo; the released training code contains no such minimum-length filter (the reproduced Weibo index still contains users with a single check-in), so a small number of extremely short trajectories that the paper would have dropped are present here.",
+        "The paper's Table 2 'Impro.' row and two claims in the abstract/ablation text are internally inconsistent with its own tables, so the paper numbers are quoted as published and never recomputed.",
+        "Differences in F1/AUC below roughly two percentage points cannot be interpreted as a methodological difference given the undocumented split and pair sampling."
+      ],
+      "ablation": {
+        "w/o MTE (no masked transformer encoder)": [
+          62.05,
+          64.33,
+          71.63,
+          83.33
+        ],
+        "w/o CAB (no correlation attention block)": [
+          56.17,
+          67.04,
+          67.1,
+          82.2
+        ],
+        "w/o TTE (no temporal transformer encoder)": [
+          54.2,
+          58.38,
+          68.52,
+          84.98
+        ],
+        "MT-Link (paper)": [
+          68.06,
+          82.43,
+          73.82,
+          87.86
+        ]
+      }
+    }
+  }
+]

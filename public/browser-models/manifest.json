@@ -1,0 +1,229 @@
+{
+  "schema": "mtlink-browser-models/v1",
+  "pairs": [
+    {
+      "id": "isp_wb_improved",
+      "label": "ISP - Weibo",
+      "dense": "isp",
+      "sparse": "wb",
+      "platform_a": "ISP",
+      "platform_b": "Weibo",
+      "default_seed": "454",
+      "model_family": "official_camtnet",
+      "model_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "decision": {
+        "threshold": 0.5,
+        "threshold_source": "Figure 2 of the AAAI-2025 MT-Link paper (p >= 0.5 -> same user) and the official implementation's utils.compute_metrics (preds_binary = (preds >= 0.5)).",
+        "score_semantics": "sigmoid-activated model output in [0,1]. The official training code applies BCEWithLogitsLoss on top of the already sigmoid-activated output, so this value must NOT be presented as a calibrated probability.",
+        "positive_label": "Same person (matched cross-platform accounts)"
+      },
+      "seeds": {
+        "454": {
+          "file": "isp_wb_improved/454.onnx",
+          "loc_size": 3298,
+          "bytes": 1701774
+        },
+        "512": {
+          "file": "isp_wb_improved/512.onnx",
+          "loc_size": 3297,
+          "bytes": 1701518
+        },
+        "631": {
+          "file": "isp_wb_improved/631.onnx",
+          "loc_size": 3298,
+          "bytes": 1701774
+        },
+        "812": {
+          "file": "isp_wb_improved/812.onnx",
+          "loc_size": 3295,
+          "bytes": 1701006
+        },
+        "932": {
+          "file": "isp_wb_improved/932.onnx",
+          "loc_size": 3298,
+          "bytes": 1701774
+        }
+      }
+    },
+    {
+      "id": "tw_fs_improved",
+      "label": "Twitter - Foursquare",
+      "dense": "tw",
+      "sparse": "fs",
+      "platform_a": "Twitter",
+      "platform_b": "Foursquare",
+      "default_seed": "454",
+      "model_family": "official_camtnet",
+      "model_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "decision": {
+        "threshold": 0.5,
+        "threshold_source": "Figure 2 of the AAAI-2025 MT-Link paper (p >= 0.5 -> same user) and the official implementation's utils.compute_metrics (preds_binary = (preds >= 0.5)).",
+        "score_semantics": "sigmoid-activated model output in [0,1]. The official training code applies BCEWithLogitsLoss on top of the already sigmoid-activated output, so this value must NOT be presented as a calibrated probability.",
+        "positive_label": "Same person (matched cross-platform accounts)"
+      },
+      "seeds": {
+        "454": {
+          "file": "tw_fs_improved/454.onnx",
+          "loc_size": 21707,
+          "bytes": 6414482
+        },
+        "512": {
+          "file": "tw_fs_improved/512.onnx",
+          "loc_size": 21706,
+          "bytes": 6414226
+        },
+        "631": {
+          "file": "tw_fs_improved/631.onnx",
+          "loc_size": 21706,
+          "bytes": 6414226
+        },
+        "812": {
+          "file": "tw_fs_improved/812.onnx",
+          "loc_size": 21706,
+          "bytes": 6414226
+        },
+        "932": {
+          "file": "tw_fs_improved/932.onnx",
+          "loc_size": 21706,
+          "bytes": 6414226
+        }
+      }
+    },
+    {
+      "id": "tw_fb_improved",
+      "label": "Twitter - Facebook",
+      "dense": "tw",
+      "sparse": "fb",
+      "platform_a": "Twitter",
+      "platform_b": "Facebook",
+      "default_seed": "454",
+      "model_family": "official_camtnet",
+      "model_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "decision": {
+        "threshold": 0.5,
+        "threshold_source": "Figure 2 of the AAAI-2025 MT-Link paper (p >= 0.5 -> same user) and the official implementation's utils.compute_metrics (preds_binary = (preds >= 0.5)).",
+        "score_semantics": "sigmoid-activated model output in [0,1]. The official training code applies BCEWithLogitsLoss on top of the already sigmoid-activated output, so this value must NOT be presented as a calibrated probability.",
+        "positive_label": "Same person (matched cross-platform accounts)"
+      },
+      "seeds": {
+        "454": {
+          "file": "tw_fb_improved/454.onnx",
+          "loc_size": 21707,
+          "bytes": 6414482
+        },
+        "512": {
+          "file": "tw_fb_improved/512.onnx",
+          "loc_size": 21707,
+          "bytes": 6414482
+        },
+        "631": {
+          "file": "tw_fb_improved/631.onnx",
+          "loc_size": 21707,
+          "bytes": 6414482
+        },
+        "812": {
+          "file": "tw_fb_improved/812.onnx",
+          "loc_size": 21707,
+          "bytes": 6414482
+        },
+        "932": {
+          "file": "tw_fb_improved/932.onnx",
+          "loc_size": 21707,
+          "bytes": 6414482
+        }
+      }
+    },
+    {
+      "id": "fs_fb_improved",
+      "label": "Foursquare - Facebook",
+      "dense": "fs",
+      "sparse": "fb",
+      "platform_a": "Foursquare",
+      "platform_b": "Facebook",
+      "default_seed": "454",
+      "model_family": "official_camtnet",
+      "model_config": {
+        "embed_size": 64,
+        "hidden_size": 128,
+        "num_layers": 4,
+        "num_layers_mask": 2,
+        "num_layers_attn": 1,
+        "p_drop": 0.2,
+        "num_heads": 8,
+        "prob": 0.15,
+        "threshold": 0.2,
+        "mask_strategy": "topK",
+        "classifier_type": "MeanPool"
+      },
+      "decision": {
+        "threshold": 0.5,
+        "threshold_source": "Figure 2 of the AAAI-2025 MT-Link paper (p >= 0.5 -> same user) and the official implementation's utils.compute_metrics (preds_binary = (preds >= 0.5)).",
+        "score_semantics": "sigmoid-activated model output in [0,1]. The official training code applies BCEWithLogitsLoss on top of the already sigmoid-activated output, so this value must NOT be presented as a calibrated probability.",
+        "positive_label": "Same person (matched cross-platform accounts)"
+      },
+      "seeds": {
+        "454": {
+          "file": "fs_fb_improved/454.onnx",
+          "loc_size": 21700,
+          "bytes": 6412690
+        },
+        "512": {
+          "file": "fs_fb_improved/512.onnx",
+          "loc_size": 21700,
+          "bytes": 6412690
+        },
+        "631": {
+          "file": "fs_fb_improved/631.onnx",
+          "loc_size": 21702,
+          "bytes": 6413202
+        },
+        "812": {
+          "file": "fs_fb_improved/812.onnx",
+          "loc_size": 21702,
+          "bytes": 6413202
+        },
+        "932": {
+          "file": "fs_fb_improved/932.onnx",
+          "loc_size": 21700,
+          "bytes": 6412690
+        }
+      }
+    }
+  ]
+}

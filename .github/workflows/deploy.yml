@@ -36,7 +36,8 @@ jobs:
 
       - name: Build
         env:
-          VITE_API_BASE_URL: ${{ vars.VITE_API_BASE_URL }}
+          VITE_BROWSER_MODE: "true"
+          VITE_API_BASE_URL: ""
         run: npm run build
 
       - name: Prepare SPA fallback

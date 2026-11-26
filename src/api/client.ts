@@ -10,6 +10,8 @@
  */
 import axios, { AxiosError } from "axios";
 
+import * as local from "../browser/localApi";
+
 import type {
   ComboMetadata,
   ConfigResponse,
@@ -26,6 +28,8 @@ import type {
 } from "../types";
 
 const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").trim() || "/api";
+
+const BROWSER_MODE = import.meta.env.VITE_BROWSER_MODE === "true";
 
 const api = axios.create({
   baseURL: apiBaseUrl,
@@ -49,22 +53,27 @@ export function describeError(reason: unknown): string {
 }
 
 export async function getHealth(): Promise<HealthResponse> {
+  if (BROWSER_MODE) return local.getHealth();
   return (await api.get<HealthResponse>("/health")).data;
 }
 
 export async function getConfig(): Promise<ConfigResponse> {
+  if (BROWSER_MODE) return local.getConfig();
   return (await api.get<ConfigResponse>("/config")).data;
 }
 
 export async function getPlatforms(): Promise<PlatformInfo[]> {
+  if (BROWSER_MODE) return local.getPlatforms();
   return (await api.get<PlatformInfo[]>("/platforms")).data;
 }
 
 export async function getPairs(): Promise<ComboMetadata[]> {
+  if (BROWSER_MODE) return local.getPairs();
   return (await api.get<ComboMetadata[]>("/pairs")).data;
 }
 
 export async function getPair(comboId: string): Promise<ComboMetadata> {
+  if (BROWSER_MODE) return local.getPair(comboId);
   return (await api.get<ComboMetadata>(`/pairs/${comboId}`)).data;
 }
 
@@ -78,6 +87,7 @@ export async function getUsers(params: {
   sort?: "user_id" | "length" | "length_desc" | "max_loc_desc";
   seed?: string;
 }): Promise<UserPage> {
+  if (BROWSER_MODE) return local.getUsers(params);
   return (
     await api.get<UserPage>(`/pairs/${params.comboId}/users`, {
       params: {
@@ -107,6 +117,7 @@ export async function getUserDetail(params: {
   previewStrategy?: "head" | "spread";
   seed?: string;
 }): Promise<UserDetail> {
+  if (BROWSER_MODE) return local.getUserDetail(params);
   return (
     await api.get<UserDetail>(`/pairs/${params.comboId}/users/${params.side}/${params.userId}`, {
       params: {
@@ -123,6 +134,7 @@ export async function getSuggestedPairs(
   limit = 4,
   seed?: string,
 ): Promise<SuggestedPairs> {
+  if (BROWSER_MODE) return local.getSuggestedPairs(comboId, limit, seed);
   return (
     await api.get<SuggestedPairs>(`/pairs/${comboId}/suggested-pairs`, { params: { limit, seed } })
   ).data;
@@ -140,6 +152,7 @@ export async function matchPair(request: {
   dropA?: number[];
   dropB?: number[];
 }): Promise<MatchResponse> {
+  if (BROWSER_MODE) return local.matchPair(request);
   return (
     await api.post<MatchResponse>("/match", {
       combo_id: request.comboId,
@@ -156,10 +169,12 @@ export async function matchPair(request: {
 }
 
 export async function getExperiments(): Promise<ExperimentPayload[]> {
+  if (BROWSER_MODE) return local.getExperiments();
   return (await api.get<ExperimentPayload[]>("/experiments")).data;
 }
 
 export async function getExperiment(comboId: string): Promise<ExperimentPayload> {
+  if (BROWSER_MODE) return local.getExperiment(comboId);
   return (await api.get<ExperimentPayload>(`/experiments/${comboId}`)).data;
 }
 
