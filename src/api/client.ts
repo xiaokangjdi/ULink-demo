@@ -25,8 +25,10 @@ import type {
   UserPage,
 } from "../types";
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL ?? "").trim() || "/api";
+
 const api = axios.create({
-  baseURL: "/api",
+  baseURL: apiBaseUrl,
   timeout: 120000,
 });
 
