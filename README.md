@@ -1,13 +1,40 @@
 # MT-Link Interactive Demo — Frontend v2
 
-React 18 + TypeScript + Vite 5 + Tailwind CSS 3 + ECharts. It talks to `backend_v2`
-through the `/api` prefix.
+React 18 + TypeScript + Vite 5 + Tailwind CSS 3 + ECharts. It can talk to
+`backend_v2` through `/api`, or run the complete demo locally in the browser with ONNX.
 
 The visual language is intentionally the same as v1 — same palette, same card style,
 same `shadow-soft`, same typography — so the two demos can be compared side by side. What
 changed is the content: this version is all English, the long problem statement / method
 narrative / paper introduction are gone, and the interactive matching surface is the
 centre of the application.
+
+
+---
+
+## 0. Browser-only static build (current GitHub Pages mode)
+
+The public site no longer needs FastAPI, SSH tunnels or a GPU. The full interactive
+pipeline runs in the browser:
+
+- 20 ONNX models (4 platform pairs × 5 seeds) in `public/browser-models/`;
+- all user trajectories in compact sharded binaries in `public/browser-data/`;
+- ONNX Runtime Web in a Web Worker;
+- mask ratio, attention, evidence removal and Why drawer are computed from the ONNX
+  outputs locally.
+
+Build it with:
+
+```bash
+VITE_BROWSER_MODE=true npm run build
+npm run preview -- --port 4174
+```
+
+`scripts/copy-ort.mjs` runs automatically before `dev`/`build` and copies the ONNX
+Runtime Web WASM/worker files into `public/ort/` (generated, git-ignored).
+
+The output is roughly 295 MB including models/data; every user and every seed is
+supported. The legacy FastAPI mode remains available when `VITE_BROWSER_MODE` is not set.
 
 ---
 
