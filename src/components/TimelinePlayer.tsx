@@ -188,8 +188,8 @@ export default function TimelinePlayer({
       </svg>
 
       <p className="mt-1 text-[10px] leading-4 text-slate-400">
-        Playback uses the up-to-300-check-in display preview; the model always consumed the full
-        trajectory.
+        Display only: the map and timeline show up to 300 check-ins per user; when a trajectory is
+        shorter, every check-in is shown. The model always consumed the full trajectory.
       </p>
     </div>
   );

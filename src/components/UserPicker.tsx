@@ -51,6 +51,7 @@ export default function UserPicker({
   const [debounced, setDebounced] = useState("");
   const [users, setUsers] = useState<UserSummary[]>([]);
   const [total, setTotal] = useState(0);
+  const [scope, setScope] = useState<"test" | "all">("all");
   const [offset, setOffset] = useState(0);
   const [sort, setSort] = useState<"user_id" | "length_desc">("user_id");
   const [loading, setLoading] = useState(false);
@@ -83,6 +84,7 @@ export default function UserPicker({
         if (id !== requestId.current) return;
         setUsers((previous) => (append ? [...previous, ...page.users] : page.users));
         setTotal(page.total);
+        setScope(page.scope ?? "all");
         setOffset(nextOffset + page.users.length);
       } catch (reason) {
         if (id !== requestId.current) return;
@@ -124,9 +126,20 @@ export default function UserPicker({
           </span>
           <h3 className="text-base font-bold text-blue-900">{platformName} users</h3>
         </div>
-        <span className="rounded-full bg-slate-50 px-3 py-1 text-xs text-slate-500">
-          {formatCount(total)} selectable
-        </span>
+        <div className="flex items-center gap-1.5">
+          <span
+            className={`rounded-full px-2 py-0.5 text-[9px] font-bold uppercase tracking-wide ${
+              scope === "test"
+                ? "bg-emerald-50 text-emerald-700"
+                : "bg-amber-50 text-amber-700"
+            }`}
+          >
+            {scope === "test" ? "test split" : "all users"}
+          </span>
+          <span className="rounded-full bg-slate-50 px-3 py-1 text-xs text-slate-500">
+            {formatCount(total)} selectable
+          </span>
+        </div>
       </header>
 
       <div className="mt-3 flex items-center gap-2">

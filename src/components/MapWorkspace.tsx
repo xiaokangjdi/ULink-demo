@@ -835,8 +835,9 @@ export default function MapWorkspace({
 
       <p className="mt-2 text-[10px] leading-4 text-slate-400">
         Hover a check-in or a green C point for details; click a C point or a table row to pin and fly to
-        it. The map uses real WGS-84 coordinates — no GCJ-02 offset. Timeline covers the up-to-300-check-in
-        display preview; the model always consumed the full trajectory. Basemap: OpenStreetMap with OSM
+        it. The map uses real WGS-84 coordinates — no GCJ-02 offset. The timeline shows up to 300
+        check-ins per user for display (all of them when the trajectory is shorter); the model always
+        consumed the full trajectory. Basemap: OpenStreetMap with OSM
         mirrors as fallbacks.
       </p>
     </section>
@@ -895,6 +896,8 @@ function EndpointMarker({
           {label} · step {point.step}
           <br />
           loc {point.locId}
+          <br />
+          {point.lat.toFixed(5)}, {point.lon.toFixed(5)}
         </span>
       </Tooltip>
     </CircleMarker>

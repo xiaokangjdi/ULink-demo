@@ -1,6 +1,7 @@
 import { ArrowUpRight, Info, MapPin, Sparkles, X } from "lucide-react";
 import { useEffect, useMemo, useRef } from "react";
 
+import { topAttentionLinks } from "../lib/attention";
 import { formatMs, formatScore } from "../lib/format";
 import type { AttentionMatrix, CoOccurrencePair, MatchResponse, TrajectoryStep, UserDetail } from "../types";
 
@@ -39,13 +40,6 @@ const polyline = (points: { x: number; y: number }[]) =>
 
 const distanceLabel = (metres: number) =>
   metres < 1000 ? `${Math.round(metres)} m` : `${(metres / 1000).toFixed(2)} km`;
-
-const spanLabel = (span: number, slots: number[]) => {
-  const looksLikeSeconds = slots.some((slot) => slot > 1e8);
-  if (!looksLikeSeconds) return `${span} time slot(s)`;
-  if (span >= 3600) return `${(span / 3600).toFixed(1)} h`;
-  return `${Math.round(span / 60)} min`;
-};
 
 const cellValue = (matrix: AttentionMatrix | null, aStep: number, bStep: number): number | null => {
   if (!matrix || !matrix.values.length) return null;
@@ -124,55 +118,25 @@ export default function MatchInspector({
     };
   }, [detailA, detailB, coPairs]);
 
-  const evidence = useMemo(() => {
-    if (!coPairs.length) return { count: 0, span: 0, meanDistance: 0, spanText: "0" };
-    const slots = coPairs.map((pair) => pair.slot);
-    const span = Math.max(...slots) - Math.min(...slots);
-    const meanDistance = coPairs.reduce((sum, pair) => sum + pair.distanceM, 0) / coPairs.length;
-    return {
-      count: coPairs.length,
-      span,
-      meanDistance,
-      spanText: spanLabel(span, slots),
-    };
-  }, [coPairs]);
+  const evidence = useMemo(() => ({ count: coPairs.length }), [coPairs]);
 
   const selectedAttention = useMemo(() => {
     if (!selectedPair || !result?.attention) return null;
     return cellValue(result.attention.a_to_b, selectedPair.a.step, selectedPair.b.step);
   }, [selectedPair, result]);
 
-  const topLinks = useMemo(() => {
-    const matrix = result?.attention?.a_to_b;
-    if (!matrix || !matrix.values.length) return [];
-    const stride = matrix.downsampled ? Math.max(1, matrix.stride || 1) : 1;
-    const tokenA = result?.tokens?.a ?? detailA?.preview ?? [];
-    const tokenB = result?.tokens?.b ?? detailB?.preview ?? [];
-    const byStepA = new Map(tokenA.map((step) => [step.step, step]));
-    const byStepB = new Map(tokenB.map((step) => [step.step, step]));
-    const links: {
-      weight: number;
-      aStep: number;
-      bStep: number;
-      aLoc: number | null;
-      bLoc: number | null;
-    }[] = [];
-    matrix.values.forEach((row, rowIndex) => {
-      row.forEach((value, columnIndex) => {
-        if (!Number.isFinite(value)) return;
-        const aStep = rowIndex * stride + 1;
-        const bStep = columnIndex * stride + 1;
-        links.push({
-          weight: value,
-          aStep,
-          bStep,
-          aLoc: byStepA.get(aStep)?.loc_id ?? null,
-          bLoc: byStepB.get(bStep)?.loc_id ?? null,
-        });
-      });
-    });
-    return links.sort((left, right) => right.weight - left.weight).slice(0, 6);
-  }, [result, detailA, detailB]);
+  const topLinks = useMemo(
+    () =>
+      topAttentionLinks(
+        result?.attention,
+        result?.tokens?.a,
+        result?.tokens?.b,
+        detailA?.preview,
+        detailB?.preview,
+        6,
+      ),
+    [result, detailA, detailB],
+  );
 
   if (!open) return null;
 
@@ -363,22 +327,10 @@ export default function MatchInspector({
           ) : (
             <section className="rounded-xl border border-blue-100 bg-white p-4">
               <h3 className="text-xs font-bold text-blue-900">Whole-pair evidence</h3>
-              <dl className="mt-3 grid grid-cols-3 gap-3 text-[11px] leading-4">
-                <div>
-                  <dt className="text-slate-400">co-occurrences</dt>
-                  <dd className="text-lg font-bold tabular-nums text-emerald-700">{evidence.count}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-400">time span</dt>
-                  <dd className="text-sm font-semibold text-slate-700">{evidence.spanText}</dd>
-                </div>
-                <div>
-                  <dt className="text-slate-400">mean distance</dt>
-                  <dd className="text-sm font-semibold text-slate-700">
-                    {evidence.count ? distanceLabel(evidence.meanDistance) : "—"}
-                  </dd>
-                </div>
-              </dl>
+              <div className="mt-3 flex items-baseline gap-2 text-[11px] leading-4">
+                <span className="text-slate-400">co-occurrences</span>
+                <span className="text-lg font-bold tabular-nums text-emerald-700">{evidence.count}</span>
+              </div>
             </section>
           )}
 
@@ -429,8 +381,7 @@ export default function MatchInspector({
             {result?.attention && topLinks.length > 0 && (
               <p className="mt-2 flex items-start gap-1.5 text-[10px] leading-4 text-slate-400">
                 <Info size={11} className="mt-0.5 shrink-0" />
-                Attention is an internal model signal, not a causal explanation. When the matrix is
-                downsampled, token numbers refer to the start of a reduced block.
+                Attention is an internal model signal, not a causal explanation.
               </p>
             )}
           </section>

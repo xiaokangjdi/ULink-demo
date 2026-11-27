@@ -215,6 +215,8 @@ export interface UserPage {
   seed?: string;
   loc_size?: number;
   query: string;
+  /** Whether the picker is restricted to the test split or shows the full index. */
+  scope?: "test" | "all";
   total: number;
   offset: number;
   limit: number;

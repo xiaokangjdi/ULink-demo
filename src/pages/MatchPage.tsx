@@ -11,9 +11,12 @@ import MaskWhatIf from "../components/MaskWhatIf";
 import MatchInspector from "../components/MatchInspector";
 import MatchResultPanel from "../components/MatchResultPanel";
 import PipelineStages from "../components/PipelineStages";
+import TrainingLossCurves from "../components/TrainingLossCurves";
 import UserPicker from "../components/UserPicker";
 import UserSummaryCard from "../components/UserSummaryCard";
 import { describeError, getHealth, getPairs, getSuggestedPairs, getUserDetail, matchPair } from "../api/client";
+import { curatedFor } from "../data/curatedPairs";
+import { topAttentionLinks } from "../lib/attention";
 import { formatCount, formatMs, formatScore } from "../lib/format";
 import type {
   CoOccurrencePair,
@@ -71,6 +74,7 @@ export default function MatchPage() {
   const [activeTab, setActiveTab] = useState<TabName>("trajectories");
   /** Hover highlight and click-to-pin are separate: hovering never moves the map. */
   const [highlightedPair, setHighlightedPair] = useState<number | null>(null);
+  const [highlightedAttention, setHighlightedAttention] = useState<number | null>(null);
   const [focusedPair, setFocusedPair] = useState<number | null>(null);
   const [inspectorOpen, setInspectorOpen] = useState(false);
   const [inspectorPair, setInspectorPair] = useState<number | null>(null);
@@ -131,6 +135,11 @@ export default function MatchPage() {
   }, [allCombos, comboId]);
 
   const combo = useMemo(() => pairs.find((pair) => pair.id === comboId) ?? null, [pairs, comboId]);
+
+  const curated = useMemo(
+    () => (combo ? curatedFor(combo.id, seed || combo.seed) : { positive: [], negative: [] }),
+    [combo, seed],
+  );
 
   /** Seeds registered for the resolved pair, with their per-seed vocabularies. */
   const seedOptions = useMemo(() => combo?.seeds ?? [], [combo]);
@@ -198,7 +207,16 @@ export default function MatchPage() {
     let cancelled = false;
     getSuggestedPairs(combo.id, 4, seed || undefined)
       .then((payload) => {
-        if (!cancelled) setSuggestions(payload);
+        if (!cancelled) {
+          // Quick picks intentionally show curated pairs only. A generic test-set
+          // pair can violate the M-over-C rule, and the whole point of this list
+          // is that every visible pair has been screened.
+          setSuggestions({
+            ...payload,
+            matched_examples: curated.positive,
+            unmatched_examples: curated.negative,
+          });
+        }
       })
       .catch(() => {
         if (!cancelled) setSuggestions(null);
@@ -206,7 +224,7 @@ export default function MatchPage() {
     return () => {
       cancelled = true;
     };
-  }, [combo?.id, seed]);
+  }, [combo?.id, seed, curated]);
 
   // Selecting a different seed invalidates the current pair and any result.
   useEffect(() => {
@@ -224,14 +242,21 @@ export default function MatchPage() {
     setRemovedEvidence(null);
     setEvidenceResult(null);
     setAttentionFocus(null);
+    setHighlightedAttention(null);
     setActiveTab("trajectories");
   }, [seed]);
 
   // A new pair means a new map: clear hover/pin so a stale C-point cannot focus.
   useEffect(() => {
     setHighlightedPair(null);
+    setHighlightedAttention(null);
     setFocusedPair(null);
   }, [detailA?.user_id, detailB?.user_id]);
+
+  // A new attention matrix (or a new forward pass) invalidates the old M hover.
+  useEffect(() => {
+    setHighlightedAttention(null);
+  }, [result?.attention]);
 
   /* ------------------------------------------------------- user details */
   const loadDetail = useCallback(
@@ -361,6 +386,7 @@ export default function MatchPage() {
     selectionComboRef.current = "";
     autoLoadedRef.current = true;
     setHighlightedPair(null);
+    setHighlightedAttention(null);
     setFocusedPair(null);
     setSelectedA(null);
     setSelectedB(null);
@@ -467,6 +493,79 @@ export default function MatchPage() {
     });
     return { coPairs: found, timeUnitLabel: unit };
   }, [detailA, detailB]);
+
+  /**
+   * The model-side counterpart of the manual C points: the strongest cells of the
+   * learned correlation attention (the stronger of A -> B and B -> A). A cell is
+   * one (A check-in, B check-in) pair, so it can be compared with a C pair by its
+   * two step numbers.
+   */
+  const attentionTarget = useMemo(() => {
+    const shorter = Math.min(
+      detailA?.trajectory_length ?? 0,
+      detailB?.trajectory_length ?? 0,
+    );
+    return shorter > 0 ? Math.max(0, Math.min(10, shorter - 1)) : 0;
+  }, [detailA, detailB]);
+
+  const attentionTopLinks = useMemo(
+    () =>
+      topAttentionLinks(
+        result?.attention,
+        result?.tokens?.a,
+        result?.tokens?.b,
+        detailA?.preview,
+        detailB?.preview,
+        attentionTarget,
+        true,
+        "both",
+      ),
+    [result, detailA, detailB, attentionTarget],
+  );
+
+  /** C index -> M index and M index -> C index for pairs that are exactly the same. */
+  const attentionMatches = useMemo(() => {
+    const byM = new Map<number, number>();
+    const byC = new Map<number, number>();
+    attentionTopLinks.forEach((link, mIndex) => {
+      const cIndex = coPairs.findIndex(
+        (pair) => pair.a.step === link.aStep && pair.b.step === link.bStep,
+      );
+      if (cIndex >= 0) {
+        byM.set(mIndex, cIndex);
+        byC.set(cIndex, mIndex);
+      }
+    });
+    return { byM, byC };
+  }, [attentionTopLinks, coPairs]);
+
+  /** Hover a C row: highlight its C row and the matching M row, if any. */
+  const highlightCoPair = useCallback(
+    (index: number | null) => {
+      setHighlightedPair(index);
+      setHighlightedAttention(index === null ? null : attentionMatches.byC.get(index) ?? null);
+    },
+    [attentionMatches],
+  );
+
+  /** Hover an M row: highlight its M row and the matching C row, if any. */
+  const highlightMPoint = useCallback(
+    (index: number | null) => {
+      setHighlightedAttention(index);
+      setHighlightedPair(index === null ? null : attentionMatches.byM.get(index) ?? null);
+    },
+    [attentionMatches],
+  );
+
+  /** Pin a C point and keep its M counterpart highlighted. */
+  const focusCoPair = useCallback(
+    (index: number) => {
+      setFocusedPair(index);
+      setHighlightedPair(index);
+      setHighlightedAttention(attentionMatches.byC.get(index) ?? null);
+    },
+    [attentionMatches],
+  );
 
   const displayResult = whatIfResult ?? result;
 
@@ -673,31 +772,6 @@ export default function MatchPage() {
             )}
           </section>
 
-          <div className="space-y-3">
-            <UserPicker
-              comboId={combo?.id ?? ""}
-              side="a"
-              platformName={combo?.platform_a ?? denseOptions.find(([key]) => key === platformA)?.[1] ?? "Platform A"}
-              accent="blue"
-              selected={selectedA}
-              counterpartUserId={selectedB?.user_id ?? null}
-              seed={seed || undefined}
-              disabled={!combo?.available}
-              onSelect={(user) => selectUser("a", user)}
-            />
-            <UserPicker
-              comboId={combo?.id ?? ""}
-              side="b"
-              platformName={combo?.platform_b ?? "Platform B"}
-              accent="violet"
-              selected={selectedB}
-              counterpartUserId={selectedA?.user_id ?? null}
-              seed={seed || undefined}
-              disabled={!combo?.available}
-              onSelect={(user) => selectUser("b", user)}
-            />
-          </div>
-
           {suggestions && (
             <section className="flex-1 rounded-2xl border border-blue-100 bg-white p-5 shadow-soft">
               <header className="flex items-center gap-2">
@@ -705,6 +779,12 @@ export default function MatchPage() {
                 <h3 className="text-sm font-bold text-blue-900">Quick picks</h3>
               </header>
               <div className="mt-3 space-y-2">
+                {suggestions.matched_examples.length === 0 && suggestions.unmatched_examples.length === 0 && (
+                  <p className="rounded-xl border border-slate-100 bg-slate-50/60 px-3 py-3 text-[11px] leading-4 text-slate-500">
+                    No curated pair is available for this platform/seed yet. Use the id search
+                    below to pick users manually.
+                  </p>
+                )}
                 {[
                   { label: "Ground-truth match", list: suggestions.matched_examples },
                   { label: "Different ids", list: suggestions.unmatched_examples },
@@ -735,6 +815,31 @@ export default function MatchPage() {
             </section>
           )}
 
+          <div className="space-y-3">
+            <UserPicker
+              comboId={combo?.id ?? ""}
+              side="a"
+              platformName={combo?.platform_a ?? denseOptions.find(([key]) => key === platformA)?.[1] ?? "Platform A"}
+              accent="blue"
+              selected={selectedA}
+              counterpartUserId={selectedB?.user_id ?? null}
+              seed={seed || undefined}
+              disabled={!combo?.available}
+              onSelect={(user) => selectUser("a", user)}
+            />
+            <UserPicker
+              comboId={combo?.id ?? ""}
+              side="b"
+              platformName={combo?.platform_b ?? "Platform B"}
+              accent="violet"
+              selected={selectedB}
+              counterpartUserId={selectedA?.user_id ?? null}
+              seed={seed || undefined}
+              disabled={!combo?.available}
+              onSelect={(user) => selectUser("b", user)}
+            />
+          </div>
+
           <PipelineStages pipeline={displayResult?.pipeline ?? null} running={running} />
 
         </div>
@@ -748,10 +853,15 @@ export default function MatchPage() {
               coPairs={coPairs}
               highlightedPair={highlightedPair}
               focusedPair={focusedPair}
-              onHighlight={setHighlightedPair}
+              onHighlight={highlightCoPair}
               onSelectPair={(index) => {
-                setFocusedPair(index);
-                setHighlightedPair(index);
+                if (index === null) {
+                  setFocusedPair(null);
+                  setHighlightedPair(null);
+                  setHighlightedAttention(null);
+                  return;
+                }
+                focusCoPair(index);
               }}
               onExplain={openInspector}
               maskedStepsA={whatIfMask?.a}
@@ -804,12 +914,15 @@ export default function MatchPage() {
                 <EvidenceLab
                   comboId={combo?.id ?? null}
                   seed={seed}
-                  seeds={(combo?.seeds ?? []).filter((item) => item.available).map((item) => item.seed)}
                   detailA={detailA}
                   detailB={detailB}
                   coPairs={coPairs}
                   selectedPair={focusedPair}
                   baseline={result}
+                  attentionLinks={attentionTopLinks}
+                  matchedCByM={attentionMatches.byM}
+                  highlightedM={highlightedAttention}
+                  onHoverM={highlightMPoint}
                   onRemoveChange={setRemovedEvidence}
                   onResultChange={setEvidenceResult}
                 />
@@ -885,28 +998,31 @@ export default function MatchPage() {
                     </div>
                   )}
                   {detailA && detailB && (
-                    <CoOccurrenceTable
-                      pairs={coPairs}
-                      platformAName={detailA.platform.toUpperCase()}
-                      platformBName={detailB.platform.toUpperCase()}
-                      timeUnitLabel={timeUnitLabel}
-                      highlightedPair={highlightedPair}
-                      focusedPair={focusedPair}
-                      onHighlight={setHighlightedPair}
-                      onExplain={openInspector}
-                      onSelect={(index) => {
-                        setFocusedPair(index);
-                        setHighlightedPair(index);
-                        // The table sits below the map; bring the focused pair into view.
-                        window.setTimeout(
-                          () =>
-                            document
-                              .getElementById("trajectory-map")
-                              ?.scrollIntoView({ behavior: "smooth", block: "start" }),
-                          80,
-                        );
-                      }}
-                    />
+                    <div className="space-y-4">
+                      <CoOccurrenceTable
+                        pairs={coPairs}
+                        platformAName={detailA.platform.toUpperCase()}
+                        platformBName={detailB.platform.toUpperCase()}
+                        timeUnitLabel={timeUnitLabel}
+                        highlightedPair={highlightedPair}
+                        focusedPair={focusedPair}
+                        matchedMByC={attentionMatches.byC}
+                        highlightedM={highlightedAttention}
+                        onHighlight={highlightCoPair}
+                        onExplain={openInspector}
+                        onSelect={(index) => {
+                          focusCoPair(index);
+                          // The table sits below the map; bring the focused pair into view.
+                          window.setTimeout(
+                            () =>
+                              document
+                                .getElementById("trajectory-map")
+                                ?.scrollIntoView({ behavior: "smooth", block: "start" }),
+                            80,
+                          );
+                        }}
+                      />
+                    </div>
                   )}
                 </div>
               )}
@@ -971,6 +1087,10 @@ export default function MatchPage() {
 
       </div>
 
+      <div className="mt-4">
+        <TrainingLossCurves />
+      </div>
+
       <MatchInspector
         open={inspectorOpen}
         pairIndex={inspectorPair}
@@ -979,10 +1099,7 @@ export default function MatchPage() {
         coPairs={coPairs}
         result={result}
         onClose={() => setInspectorOpen(false)}
-        onPin={(index) => {
-          setFocusedPair(index);
-          setHighlightedPair(index);
-        }}
+        onPin={focusCoPair}
       />
     </main>
   );

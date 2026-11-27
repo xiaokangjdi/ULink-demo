@@ -1,7 +1,8 @@
-import { LoaderCircle, MinusCircle, RotateCcw, Trash2 } from "lucide-react";
+import { LoaderCircle, MinusCircle, RotateCcw, Sparkles, Trash2 } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { describeError, matchPair } from "../api/client";
+import type { AttentionLink } from "../lib/attention";
 import type {
   CoOccurrencePair,
   MatchResponse,
@@ -12,27 +13,19 @@ import type {
 interface EvidenceLabProps {
   comboId: string | null;
   seed: string;
-  seeds: string[];
   detailA: UserDetail | null;
   detailB: UserDetail | null;
   coPairs: CoOccurrencePair[];
   selectedPair: number | null;
   baseline: MatchResponse | null;
+  attentionLinks: AttentionLink[];
+  /** M index -> C index, when the top-attention pair is also a manual C point. */
+  matchedCByM: Map<number, number>;
+  highlightedM?: number | null;
+  onHoverM?: (index: number | null) => void;
   onRemoveChange?: (removed: { a: number[]; b: number[] } | null) => void;
   onResultChange?: (result: MatchResponse | null) => void;
 }
-
-type Scope = "pair" | "seeds";
-
-interface ScopeRow {
-  label: string;
-  baseline: number | null;
-  after: number | null;
-  delta: number | null;
-  status: "ok" | "skipped" | "error";
-  note?: string;
-}
-
 
 const validPoints = (steps: TrajectoryStep[]) =>
   steps.filter(
@@ -127,30 +120,61 @@ const dropsFor = (
   return { a: [...a], b: [...b] };
 };
 
+/** Same removal semantics for the model-side M pairs (top attention cells). */
+const dropsForAttention = (
+  detailA: UserDetail,
+  detailB: UserDetail,
+  links: AttentionLink[],
+): { a: number[]; b: number[] } => {
+  const a = new Set<number>();
+  const b = new Set<number>();
+  const tolerance = toleranceFor(detailA, detailB);
+  const aPoints = validPoints(detailA.preview);
+  const bPoints = validPoints(detailB.preview);
+
+  for (const link of links) {
+    a.add(link.aStep - 1);
+    b.add(link.bStep - 1);
+    if (link.aLon !== null && link.aLat !== null && link.aTimestamp !== null) {
+      for (const point of aPoints) {
+        if (Math.abs(point.timestamp - link.aTimestamp) > tolerance) continue;
+        if (metresBetween(point, { lon: link.aLon, lat: link.aLat }) <= 2000) a.add(point.step - 1);
+      }
+    }
+    if (link.bLon !== null && link.bLat !== null && link.bTimestamp !== null) {
+      for (const point of bPoints) {
+        if (Math.abs(point.timestamp - link.bTimestamp) > tolerance) continue;
+        if (metresBetween(point, { lon: link.bLon, lat: link.bLat }) <= 2000) b.add(point.step - 1);
+      }
+    }
+  }
+  return { a: [...a], b: [...b] };
+};
+
 /**
- * Evidence-removal lab: remove one co-occurrence and re-run the real model.
- *
- * `Pair` re-runs one pair; `Seeds` repeats the same removal across every available
- * checkpoint. All numbers come from the backend model; skipped seeds are reported
- * with their reason.
+ * Evidence-removal lab: remove manual C points and/or attention top points M, then
+ * re-run the real model on the remaining check-ins. The M chips are first-class
+ * removable evidence, not just a comparison with the C table.
  */
 export default function EvidenceLab({
   comboId,
   seed,
-  seeds,
   detailA,
   detailB,
   coPairs,
   selectedPair,
   baseline,
+  attentionLinks,
+  matchedCByM,
+  highlightedM,
+  onHoverM,
   onRemoveChange,
   onResultChange,
 }: EvidenceLabProps) {
   const [selected, setSelected] = useState<Set<number>>(new Set());
-  const [scope, setScope] = useState<Scope>("pair");
+  const [selectedM, setSelectedM] = useState<Set<number>>(new Set());
   const [removal, setRemoval] = useState<MatchResponse | null>(null);
   const [singleBaseline, setSingleBaseline] = useState<number | null>(null);
-  const [rows, setRows] = useState<ScopeRow[]>([]);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState("");
   const [error, setError] = useState("");
@@ -177,17 +201,34 @@ export default function EvidenceLab({
     () => coPairs.filter((pair) => selected.has(pair.index)),
     [coPairs, selected],
   );
-  const drops = useMemo(() => {
+  const selectedMlinks = useMemo(
+    () => attentionLinks.filter((_, index) => selectedM.has(index)),
+    [attentionLinks, selectedM],
+  );
+
+  const cDrops = useMemo(() => {
     if (!detailA || !detailB) return { a: [], b: [] };
     return dropsFor(detailA, detailB, selectedPairs);
   }, [detailA, detailB, selectedPairs]);
-  const dropA = drops.a;
-  const dropB = drops.b;
+
+  const mDrops = useMemo(() => {
+    if (!detailA || !detailB) return { a: [], b: [] };
+    return dropsForAttention(detailA, detailB, selectedMlinks);
+  }, [detailA, detailB, selectedMlinks]);
+
+  const dropA = useMemo(
+    () => [...new Set([...cDrops.a, ...mDrops.a])],
+    [cDrops, mDrops],
+  );
+  const dropB = useMemo(
+    () => [...new Set([...cDrops.b, ...mDrops.b])],
+    [cDrops, mDrops],
+  );
+  const selectionCount = selectedPairs.length + selectedMlinks.length;
 
   const reset = useCallback(() => {
     setRemoval(null);
     setSingleBaseline(null);
-    setRows([]);
     setError("");
     setProgress("");
     onRemoveChange?.(null);
@@ -197,23 +238,52 @@ export default function EvidenceLab({
   useEffect(() => {
     reset();
     setSelected(coPairs.length ? new Set([0]) : new Set());
+    setSelectedM(new Set());
   }, [comboId, seed, detailA?.user_id, detailB?.user_id, coPairs.length, reset]);
 
   useEffect(() => {
-    if (!removal || !selectedPairs.length) {
+    setSelected((previous) => {
+      const next = new Set([...previous].filter((index) => index < coPairs.length));
+      return next;
+    });
+  }, [coPairs.length]);
+
+  useEffect(() => {
+    setSelectedM((previous) => {
+      const next = new Set([...previous].filter((index) => index < attentionLinks.length));
+      return next;
+    });
+  }, [attentionLinks.length]);
+
+  // A new attention matrix changes what M1..Mn mean; drop the old M selection/result.
+  useEffect(() => {
+    setSelectedM(new Set());
+    setRemoval(null);
+    setSingleBaseline(null);
+  }, [attentionLinks]);
+
+  useEffect(() => {
+    if (!removal || selectionCount === 0) {
       onRemoveChange?.(null);
       return;
     }
     onRemoveChange?.({ a: dropA, b: dropB });
-  }, [removal, selectedPairs.length, dropA, dropB, onRemoveChange]);
+  }, [removal, selectionCount, dropA, dropB, onRemoveChange]);
 
   const runSingle = async () => {
-    if (!selectedPairs.length || !detailA || !detailB || !comboId) return;
+    if (!selectionCount || !detailA || !detailB || !comboId) return;
+    if (dropA.length >= detailA.trajectory_length || dropB.length >= detailB.trajectory_length) {
+      setError(
+        "That selection would remove every check-in on one side. Deselect one or more C/M points and try again.",
+      );
+      return;
+    }
     const id = ++runId.current;
     setRunning(true);
     setError("");
-    setRows([]);
-    setProgress("running one forward pass with the selected co-occurrence removed…");
+    setProgress(
+      `running one forward pass with ${selectedPairs.length} C + ${selectedMlinks.length} M selected…`,
+    );
     try {
       const base = baseline ?? (await matchPair({
         comboId,
@@ -236,15 +306,6 @@ export default function EvidenceLab({
       if (id !== runId.current) return;
       setSingleBaseline(base.prediction.score);
       setRemoval(after);
-      setRows([
-        {
-          label: `This pair · ${selectedPairs.map((pair) => `C${pair.index + 1}`).join(", ")}`,
-          baseline: base.prediction.score,
-          after: after.prediction.score,
-          delta: after.prediction.score - base.prediction.score,
-          status: "ok",
-        },
-      ]);
       setProgress("");
     } catch (reason) {
       if (id === runId.current) setError(describeError(reason));
@@ -253,64 +314,36 @@ export default function EvidenceLab({
     }
   };
 
-  const runSeeds = async () => {
-    if (!selectedPairs.length || !comboId || !detailA || !detailB) return;
-    const id = ++runId.current;
-    const seedList = seeds.length ? seeds : [seed].filter(Boolean);
-    setRunning(true);
+  const selectedScore = singleBaseline ?? baseline?.prediction.score ?? null;
+  const selectedCLabels = selectedPairs.map((pair) => `C${pair.index + 1}`);
+  const selectedMLabels = [...selectedM]
+    .sort((left, right) => left - right)
+    .map((index) => `M${index + 1}`);
+  const actionParts = [
+    selectedCLabels.length ? `${selectedCLabels.length} C` : "",
+    selectedMLabels.length ? `${selectedMLabels.length} M` : "",
+  ].filter(Boolean);
+  const actionLabel = actionParts.length
+    ? `Remove ${actionParts.join(" + ")} + nearby cluster`
+    : "Remove + nearby cluster";
+
+  const clearResult = () => {
+    setRemoval(null);
+    setSingleBaseline(null);
     setError("");
-    setRows([]);
-    const next: ScopeRow[] = [];
-    for (let index = 0; index < seedList.length; index += 1) {
-      if (id !== runId.current) return;
-      const currentSeed = seedList[index];
-      setProgress(`seed ${currentSeed} · ${index + 1}/${seedList.length}`);
-      try {
-        const base = await matchPair({
-          comboId,
-          userA: detailA.user_id,
-          userB: detailB.user_id,
-          includeAttention: false,
-          includeTokens: false,
-          seed: currentSeed,
-        });
-        const after = await matchPair({
-          comboId,
-          userA: detailA.user_id,
-          userB: detailB.user_id,
-          includeAttention: false,
-          includeTokens: false,
-          seed: currentSeed,
-          dropA,
-          dropB,
-        });
-        next.push({
-          label: `seed ${currentSeed}`,
-          baseline: base.prediction.score,
-          after: after.prediction.score,
-          delta: after.prediction.score - base.prediction.score,
-          status: "ok",
-        });
-      } catch (reason) {
-        next.push({
-          label: `seed ${currentSeed}`,
-          baseline: null,
-          after: null,
-          delta: null,
-          status: "skipped",
-          note: describeError(reason),
-        });
-      }
-      setRows([...next]);
-    }
-    if (id === runId.current) {
-      setRunning(false);
-      setProgress("");
-    }
+    setProgress("");
+    onRemoveChange?.(null);
   };
 
-  const selectedScore = singleBaseline ?? baseline?.prediction.score ?? null;
-  const actionLabel = `Remove ${selectedPairs.length} C + nearby cluster`;
+  const toggleM = (index: number) => {
+    setSelectedM((previous) => {
+      const next = new Set(previous);
+      if (next.has(index)) next.delete(index);
+      else next.add(index);
+      return next;
+    });
+    clearResult();
+  };
 
   return (
     <section className="rounded-2xl border border-amber-100 bg-white p-4 shadow-soft">
@@ -320,14 +353,15 @@ export default function EvidenceLab({
             <MinusCircle size={15} className="text-amber-600" /> Evidence removal
           </h3>
           <p className="mt-1 text-[11px] leading-4 text-slate-400">
-            Select one or more co-occurrence points; the intervention removes their check-ins plus
-            the nearby redundant check-ins (±3 h and 2 km), then re-runs the real model.
+            Select manual C points and/or attention top points M; the intervention removes their
+            check-ins plus the nearby redundant check-ins (±3 h and 2 km), then re-runs the real
+            model.
           </p>
         </div>
         <button
           type="button"
           onClick={reset}
-          disabled={running || (!removal && !rows.length)}
+          disabled={running || !removal}
           className="flex items-center gap-1 rounded-lg border border-slate-200 px-2 py-1 text-[10px] font-semibold text-slate-500 hover:bg-slate-50 disabled:opacity-40"
         >
           <RotateCcw size={11} /> Restore
@@ -336,25 +370,34 @@ export default function EvidenceLab({
 
       <div className="mt-2 flex items-center justify-between gap-2">
         <span className="text-[10px] text-slate-400">
-          selected {selected.size} / {coPairs.length}
+          selected {selectedPairs.length} C + {selectedMlinks.length} M
         </span>
         <div className="flex items-center gap-1">
           <button
             type="button"
-            onClick={() => setSelected(new Set(coPairs.map((pair) => pair.index)))}
+            onClick={() => {
+              setSelected(new Set(coPairs.map((pair) => pair.index)));
+              setSelectedM(new Set(attentionLinks.map((_, index) => index)));
+              clearResult();
+            }}
             className="rounded border border-slate-200 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 hover:bg-slate-50"
           >
             Select all
           </button>
           <button
             type="button"
-            onClick={() => setSelected(new Set())}
+            onClick={() => {
+              setSelected(new Set());
+              setSelectedM(new Set());
+              clearResult();
+            }}
             className="rounded border border-slate-200 px-1.5 py-0.5 text-[9px] font-semibold text-slate-500 hover:bg-slate-50"
           >
             Clear
           </button>
         </div>
       </div>
+
       <div className="scroll-thin mt-1.5 flex max-h-[82px] flex-wrap items-center gap-1.5 overflow-y-auto rounded-lg border border-slate-100 p-1.5">
         {coPairs.map((pair) => {
           const active = selected.has(pair.index);
@@ -369,9 +412,7 @@ export default function EvidenceLab({
                   else next.add(pair.index);
                   return next;
                 });
-                setRemoval(null);
-                setRows([]);
-                onRemoveChange?.(null);
+                clearResult();
               }}
               className={`rounded-md border px-2 py-1 text-[10px] font-semibold tabular-nums ${
                 active
@@ -385,138 +426,148 @@ export default function EvidenceLab({
         })}
       </div>
 
-      <div className="mt-3 grid gap-3 lg:grid-cols-[minmax(0,1fr)_240px]">
-        <div>
-          <div className="flex flex-wrap items-center gap-2">
-            <button
-              type="button"
-              onClick={() => void runSingle()}
-              disabled={running || !selectedPairs.length || !comboId}
-              className="flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-amber-700 disabled:opacity-40"
-            >
-              <Trash2 size={12} /> {actionLabel}
-            </button>
-            {running && (
-              <span className="flex items-center gap-1 text-[10px] text-amber-700">
-                <LoaderCircle size={11} className="animate-spin" /> {progress || "running…"}
-              </span>
-            )}
-            {error && <span className="text-[10px] text-rose-600">{error}</span>}
-          </div>
+      <div className="mt-3 flex flex-wrap items-center gap-2">
+        <button
+          type="button"
+          onClick={() => void runSingle()}
+          disabled={running || selectionCount === 0 || !comboId}
+          className="flex items-center gap-1 rounded-lg bg-amber-600 px-3 py-1.5 text-[11px] font-semibold text-white hover:bg-amber-700 disabled:opacity-40"
+        >
+          <Trash2 size={12} /> {actionLabel}
+        </button>
+        {running && (
+          <span className="flex items-center gap-1 text-[10px] text-amber-700">
+            <LoaderCircle size={11} className="animate-spin" /> {progress || "running…"}
+          </span>
+        )}
+        {error && <span className="text-[10px] text-rose-600">{error}</span>}
+      </div>
 
-          {removal && selectedPairs.length > 0 && (
-            <div className="mt-3 rounded-xl border border-amber-100 bg-amber-50/40 p-3 text-[11px]">
-              <div className="flex flex-wrap items-end gap-3">
-                <span className="text-slate-500">
-                  baseline <b className="tabular-nums text-slate-700">{selectedScore?.toFixed(6) ?? "--"}</b>
-                </span>
-                <span className="text-slate-400">→</span>
-                <span className="text-slate-500">
-                  after removal <b className="tabular-nums text-amber-800">{removal.prediction.score.toFixed(6)}</b>
-                </span>
-                <span
-                  className={`rounded-full px-2 py-0.5 font-bold ${
-                    (removal.prediction.score - (selectedScore ?? 0)) < 0
-                      ? "bg-rose-100 text-rose-700"
-                      : "bg-emerald-100 text-emerald-700"
-                  }`}
-                >
-                  Δ {(removal.prediction.score - (selectedScore ?? 0)).toFixed(6)}
-                </span>
-              </div>
-              <p className="mt-1 text-[10px] text-slate-400">
-                removed {selectedPairs.map((pair) => `C${pair.index + 1}`).join(", ")} ·{" "}
-                {removal.intervention
-                  ? `${removal.intervention.drop_a.length}+${removal.intervention.drop_b.length} token(s) dropped`
-                  : "real forward pass"}
-              </p>
+      <div className="mt-3 rounded-xl border border-amber-100 bg-amber-50/30 p-2.5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <div className="flex items-center gap-1.5">
+            <Sparkles size={12} className="text-amber-600" />
+            <p className="text-[10px] font-bold uppercase tracking-wide text-amber-800">
+              Attention top points
+            </p>
+            <span className="rounded-full bg-white px-1.5 py-0.5 text-[9px] font-semibold text-amber-700">
+              {attentionLinks.length} M
+            </span>
+          </div>
+          {attentionLinks.length > 0 && (
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedM(new Set(attentionLinks.map((_, index) => index)));
+                  clearResult();
+                }}
+                className="rounded border border-amber-200 bg-white px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 hover:bg-amber-50"
+              >
+                All M
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setSelectedM(new Set());
+                  clearResult();
+                }}
+                className="rounded border border-amber-200 bg-white px-1.5 py-0.5 text-[9px] font-semibold text-amber-700 hover:bg-amber-50"
+              >
+                None
+              </button>
             </div>
           )}
         </div>
 
-        <div className="rounded-xl border border-slate-100 bg-slate-50/60 p-3">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-slate-400">Scope</p>
-          <div className="mt-2 grid grid-cols-2 gap-1 text-[10px]">
-            {(
-              [
-                ["pair", "Pair"],
-                ["seeds", "Seeds"],
-              ] as const
-            ).map(([key, label]) => (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setScope(key)}
-                className={`rounded-md px-1.5 py-1 font-semibold ${
-                  scope === key ? "bg-white text-amber-700 shadow-sm" : "text-slate-400 hover:text-slate-600"
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+        {attentionLinks.length > 0 ? (
+          <div className="mt-1.5 flex flex-wrap items-center gap-1.5">
+            {attentionLinks.map((link, index) => {
+              const active = selectedM.has(index);
+              const focused = highlightedM === index;
+              const cIndex = matchedCByM.get(index);
+              return (
+                <button
+                  key={`${link.aStep}-${link.bStep}-${index}`}
+                  type="button"
+                  onClick={() => toggleM(index)}
+                  onMouseEnter={() => onHoverM?.(index)}
+                  onMouseLeave={() => onHoverM?.(null)}
+                  title={`A #${link.aStep} (loc ${link.aLoc ?? "—"}) ↔ B #${link.bStep} (loc ${link.bLoc ?? "—"}) · attention ${link.weight.toFixed(5)}${cIndex !== undefined ? ` · also C${cIndex + 1}` : ""}`}
+                  className={`inline-flex items-center gap-1 rounded-md border px-2 py-1 text-[10px] font-semibold tabular-nums transition ${
+                    active
+                      ? "border-amber-400 bg-amber-100 text-amber-900"
+                      : "border-amber-100 bg-white text-slate-600 hover:border-amber-300"
+                  } ${focused ? "ring-2 ring-amber-300" : ""}`}
+                >
+                  <span>M{index + 1}</span>
+                  <span className="text-[9px] font-normal text-slate-400">
+                    #{link.aStep}↔#{link.bStep}
+                  </span>
+                  <span className="text-[9px] font-normal text-slate-400">{link.weight.toFixed(4)}</span>
+                  {cIndex !== undefined ? (
+                    <span className="rounded bg-emerald-50 px-1 py-0.5 text-[8px] font-bold text-emerald-700">
+                      C{cIndex + 1}
+                    </span>
+                  ) : (
+                    <span className="text-[8px] font-normal text-slate-300">no C</span>
+                  )}
+                </button>
+              );
+            })}
           </div>
-          <button
-            type="button"
-            onClick={() => {
-              if (scope === "pair") void runSingle();
-              else void runSeeds();
-            }}
-            disabled={running || !comboId}
-            className="mt-2 w-full rounded-lg border border-amber-200 bg-white px-2 py-1.5 text-[10px] font-semibold text-amber-700 hover:bg-amber-50 disabled:opacity-40"
-          >
-            {scope === "pair" ? "Run this pair" : "Run across seeds"}
-          </button>
-        </div>
+        ) : (
+          <p className="mt-1.5 text-[10px] leading-4 text-slate-400">
+            {baseline ? (
+              "This pair has too few check-ins to build M points (the target is the shorter trajectory minus one)."
+            ) : (
+              <>
+                Run <span className="font-semibold">Start matching</span> to compute the attention
+                matrix; its strongest check-in pairs appear here as M1…Mn and can be removed like C
+                points.
+              </>
+            )}
+          </p>
+        )}
+
+        <p className="mt-1.5 text-[9px] leading-3.5 text-slate-400">
+          M = top cells of the learned correlation attention (stronger of A→B / B→A), one link per
+          check-in when possible; the target is min(10, shorter trajectory − 1). A green C badge
+          means the same two check-ins also form a manual C point; “no C” means the attention pair
+          is genuinely not one of the manual co-occurrence pairs.
+        </p>
       </div>
 
-      {rows.length > 0 && (
-        <div className="mt-3">
-          <div className="scroll-thin mt-2 max-h-[240px] overflow-auto rounded-xl border border-slate-100">
-            <table className="w-full min-w-[520px] text-left text-[10px]">
-              <thead className="sticky top-0 bg-slate-50 text-slate-500">
-                <tr>
-                  <th className="px-2.5 py-1.5 font-semibold">case</th>
-                  <th className="px-2.5 py-1.5 font-semibold">baseline</th>
-                  <th className="px-2.5 py-1.5 font-semibold">after removal</th>
-                  <th className="px-2.5 py-1.5 font-semibold">Δ</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {rows.map((row) => (
-                  <tr key={row.label}>
-                    <td className="px-2.5 py-1.5 text-slate-600">
-                      {row.label}
-                      {row.status !== "ok" && (
-                        <span className="ml-1 text-[9px] text-amber-600">({row.status})</span>
-                      )}
-                    </td>
-                    <td className="px-2.5 py-1.5 tabular-nums text-slate-500">
-                      {row.baseline === null ? "—" : row.baseline.toFixed(6)}
-                    </td>
-                    <td className="px-2.5 py-1.5 tabular-nums text-slate-600">
-                      {row.after === null ? "—" : row.after.toFixed(6)}
-                    </td>
-                    <td
-                      className={`px-2.5 py-1.5 tabular-nums font-semibold ${
-                        row.delta === null
-                          ? "text-slate-400"
-                          : row.delta < -0.01
-                            ? "text-rose-600"
-                            : row.delta > 0.01
-                              ? "text-emerald-600"
-                              : "text-slate-500"
-                      }`}
-                    >
-                      {row.delta === null ? "—" : `${row.delta >= 0 ? "+" : ""}${row.delta.toFixed(6)}`}
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+      {removal && selectionCount > 0 && (
+        <div className="mt-3 rounded-xl border border-amber-100 bg-amber-50/40 p-3 text-[11px]">
+          <div className="flex flex-wrap items-end gap-3">
+            <span className="text-slate-500">
+              baseline <b className="tabular-nums text-slate-700">{selectedScore?.toFixed(6) ?? "--"}</b>
+            </span>
+            <span className="text-slate-400">→</span>
+            <span className="text-slate-500">
+              after removal <b className="tabular-nums text-amber-800">{removal.prediction.score.toFixed(6)}</b>
+            </span>
+            <span
+              className={`rounded-full px-2 py-0.5 font-bold ${
+                (removal.prediction.score - (selectedScore ?? 0)) < 0
+                  ? "bg-rose-100 text-rose-700"
+                  : "bg-emerald-100 text-emerald-700"
+              }`}
+            >
+              Δ {(removal.prediction.score - (selectedScore ?? 0)).toFixed(6)}
+            </span>
           </div>
-          {rows.some((row) => row.note) && (
-            <p className="mt-1 text-[9px] leading-3 text-slate-400">
-              {rows.find((row) => row.note)?.note}
+          <p className="mt-1 text-[10px] text-slate-400">
+            removed {[...selectedCLabels, ...selectedMLabels].join(", ")} ·{" "}
+            {removal.intervention
+              ? `${removal.intervention.drop_a.length}+${removal.intervention.drop_b.length} token(s) dropped`
+              : "real forward pass"}
+          </p>
+          {selectedScore !== null && removal.prediction.score > selectedScore && (
+            <p className="mt-1 text-[10px] leading-4 text-amber-700">
+              Score rose: these check-ins were not positive evidence for this pair. Removal is an
+              intervention, not a monotonic explanation — top attention can also point at noise.
             </p>
           )}
         </div>

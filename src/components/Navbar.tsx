@@ -1,10 +1,7 @@
 import { Link2 } from "lucide-react";
 import { NavLink } from "react-router-dom";
 
-const navItems = [
-  { to: "/match", label: "Live Matching" },
-  { to: "/results", label: "Evaluation" },
-];
+const navItems = [{ to: "/match", label: "Live Matching" }];
 
 export default function Navbar() {
   return (
@@ -15,7 +12,7 @@ export default function Navbar() {
             <Link2 size={17} strokeWidth={2.4} />
           </span>
           <span className="flex min-w-0 flex-col leading-tight">
-            <strong className="truncate text-[17px] font-bold text-blue-900">MT-Link</strong>
+            <strong className="truncate text-[17px] font-bold text-blue-900">ULink</strong>
             <span className="truncate text-[11px] font-medium uppercase tracking-wide text-blue-400">
               Interactive Demo
             </span>

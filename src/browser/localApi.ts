@@ -41,6 +41,38 @@ import {
 const BASE = import.meta.env.BASE_URL;
 const WASM_BASE = `${BASE}ort/`;
 
+interface TestUserSeed {
+  a: number[];
+  b: number[];
+}
+type TestUserFile = Record<string, Record<string, TestUserSeed>>;
+
+let testUsersPromise: Promise<TestUserFile | null> | null = null;
+
+/**
+ * The picker is restricted to the test split of the selected platform pair, so the
+ * demo does not offer tens of thousands of users that a presenter will never click.
+ * The test pair lists are derived from dataset/*.pkl (per seed) and shipped as a
+ * small static allowlist; matching itself is still unrestricted if an id is passed.
+ */
+async function testUserSet(
+  comboId: string,
+  seed: string,
+  side: "a" | "b",
+): Promise<Set<number> | null> {
+  if (!testUsersPromise) {
+    testUsersPromise = fetch(`${BASE}browser-data/test-users.json`)
+      .then((response) => (response.ok ? (response.json() as Promise<TestUserFile>) : null))
+      .catch(() => null);
+  }
+  const data = await testUsersPromise;
+  const combo = data?.[comboId];
+  if (!combo) return null;
+  const entry = combo[seed] ?? combo[Object.keys(combo)[0]];
+  if (!entry) return null;
+  return new Set(entry[side]);
+}
+
 interface WorkerResult {
   type: "result";
   id: number;
@@ -140,7 +172,11 @@ function tokenLocations(record: LocalUserRecord): TokenLocation[] {
 }
 
 function attentionMatrix(data: Float32Array, dims: number[]) {
-  const [rows, columns] = dims;
+  // The ONNX graph emits [batch, Lq, Lk] (batch = 1 at inference). The previous
+  // code destructured [rows, columns] = dims, which silently read a [1, 108, 6]
+  // tensor as a 1 x 108 matrix and truncated every attention row after the first.
+  const rows = dims.length >= 3 ? dims[dims.length - 2] : dims[0];
+  const columns = dims.length >= 3 ? dims[dims.length - 1] : dims[1];
   const values: number[][] = [];
   for (let row = 0; row < rows; row += 1) {
     const line = new Array<number>(columns);
@@ -296,6 +332,8 @@ export async function getUsers(params: {
   const offset = params.offset ?? 0;
   const limit = params.limit ?? 40;
   let users = (await searchUsers(platform, query, 0, Number.MAX_SAFE_INTEGER, locSize)).users;
+  const allowed = await testUserSet(params.comboId, seed, params.side);
+  if (allowed) users = users.filter((user) => allowed.has(user.user_id));
   const sort = params.sort ?? "user_id";
   if (sort === "length") users = [...users].sort((left, right) => left.trajectory_length - right.trajectory_length);
   if (sort === "length_desc") users = [...users].sort((left, right) => right.trajectory_length - left.trajectory_length);
@@ -308,6 +346,7 @@ export async function getUsers(params: {
     seed,
     loc_size: locSize,
     query,
+    scope: allowed ? "test" : "all",
     total: users.length,
     offset,
     limit,
@@ -348,8 +387,18 @@ export async function getSuggestedPairs(comboId: string, limit = 4, seed?: strin
   const locSize = pair.seeds[resolvedSeed]?.loc_size;
   if (!locSize) throw new Error(`No browser model for seed ${resolvedSeed}`);
   const { a, b } = await metadataFor(pair);
-  const aIds = new Set(a.filter((item) => item.max_loc <= locSize).map((item) => item.id));
-  const bIds = new Set(b.filter((item) => item.max_loc <= locSize).map((item) => item.id));
+  const allowedA = await testUserSet(comboId, resolvedSeed, "a");
+  const allowedB = await testUserSet(comboId, resolvedSeed, "b");
+  const aIds = new Set(
+    a
+      .filter((item) => item.max_loc <= locSize && (!allowedA || allowedA.has(item.id)))
+      .map((item) => item.id),
+  );
+  const bIds = new Set(
+    b
+      .filter((item) => item.max_loc <= locSize && (!allowedB || allowedB.has(item.id)))
+      .map((item) => item.id),
+  );
   const shared = [...aIds].filter((id) => bIds.has(id)).sort((left, right) => left - right).slice(0, limit);
   const aOnly = [...aIds].slice(0, limit);
   const bOnly = [...bIds].slice(0, limit);
@@ -405,9 +454,21 @@ export async function matchPair(request: {
   const locB = dropTokens(sparseRecord.loc, dropB);
   const timeB = dropTokens(sparseRecord.time, dropB);
   const stampB = dropTokens(sparseRecord.stamp, dropB);
+  if (!locA.length) {
+    throw new Error(
+      `Removing these check-ins would leave ${pair.platform_a} with an empty trajectory. Deselect one or more C/M points.`,
+    );
+  }
+  if (!locB.length) {
+    throw new Error(
+      `Removing these check-ins would leave ${pair.platform_b} with an empty trajectory. Deselect one or more C/M points.`,
+    );
+  }
   const timings: TimingBreakdown = { user_lookup: 0, feature_build: 0, model_forward: 0, postprocess: 0, total: 0 };
   const started = performance.now();
-  const result = await runWorker({
+  let result: WorkerResult;
+  try {
+    result = await runWorker({
     type: "run",
     modelUrl: modelUrl(pair, seed),
     wasmBase: WASM_BASE,
@@ -416,9 +477,18 @@ export async function matchPair(request: {
     stampA,
     locB,
     timeB,
-    stampB,
-    maskRatio,
-  });
+      stampB,
+      maskRatio,
+    });
+  } catch (reason) {
+    const message = reason instanceof Error ? reason.message : String(reason);
+    if (/^\d+$/.test(message)) {
+      throw new Error(
+        "The browser model rejected this removal (the remaining trajectory is invalid or empty). Deselect one or more C/M points and try again.",
+      );
+    }
+    throw reason;
+  }
   const finished = performance.now();
   const maskAIndices = result.maskA.map((value, index) => (value >= 0.5 ? index : -1)).filter((value) => value >= 0);
   const maskBIndices = result.maskB.map((value, index) => (value >= 0.5 ? index : -1)).filter((value) => value >= 0);
